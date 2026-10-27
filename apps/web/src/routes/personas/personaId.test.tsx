@@ -37,7 +37,8 @@ vi.mock("~/lib/auth", () => ({
   useAuth: () => ({ user: state.user, token: null, isLoading: false, login: vi.fn(), logout: vi.fn() }),
 }));
 
-vi.mock("~/lib/api", () => ({
+vi.mock("~/lib/api", async (importOriginal) => ({
+  ApiError: (await importOriginal<typeof import("~/lib/api")>()).ApiError,
   api: {
     get: vi.fn(async (path: string) => {
       if (path === "/personas/p-001") return rex;

@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { api } from "~/lib/api";
 import { AuthGate } from "~/components/AuthGate";
+import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
 import { cartQueryOptions, invalidateCart } from "~/lib/cart";
 import type { Order } from "@acme/shared";
@@ -24,6 +25,7 @@ function CheckoutSkeleton() {
 }
 
 function CheckoutContents() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState(user?.username ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
