@@ -38,6 +38,24 @@ describe("favorites routes", () => {
     expect((await app.inject(authed(user, { method: "POST", url: "/favorites", payload: { personaId: "nope" } }))).statusCode).toBe(404);
   });
 
+  it("400s (not 500s) on a missing, null or non-string body", async () => {
+    const post = (payload?: unknown) =>
+      app.inject(authed(user, { method: "POST", url: "/favorites", payload, headers: { "content-type": "application/json" } }));
+
+    const missing = await post(undefined);
+    expect(missing.statusCode).toBe(400);
+
+    const nul = await post("null");
+    expect(nul.statusCode).toBe(400);
+
+    const notString = await post({ personaId: 123 });
+    expect(notString.statusCode).toBe(400);
+    expect(notString.json<{ error: { fieldErrors: Record<string, string[]> } }>().error.fieldErrors.personaId).toBeDefined();
+
+    const empty = await post({ personaId: "" });
+    expect(empty.statusCode).toBe(400);
+  });
+
   it("removes a favorite and 404s on a second removal", async () => {
     expect((await app.inject(authed(user, { method: "DELETE", url: "/favorites/p-003" }))).statusCode).toBe(200);
     expect(await list()).toEqual([]);

@@ -1,5 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { Persona } from "@acme/shared";
+import { jest } from "@jest/globals";
+import { db } from "../src/db.js";
 import { createTestApp } from "./helpers.js";
 
 let app: FastifyInstance;
@@ -34,6 +36,39 @@ describe("GET /personas", () => {
     const res = await app.inject({ method: "GET", url: "/personas?q=definitely-not-a-persona-xyz" });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual([]);
+  });
+
+  describe("query validation (personaFilterSchema)", () => {
+    it("400s on a non-numeric minPrice", async () => {
+      const res = await app.inject({ method: "GET", url: "/personas?minPrice=abc" });
+      expect(res.statusCode).toBe(400);
+      expect(res.json<{ error: { fieldErrors: Record<string, string[]> } }>().error.fieldErrors.minPrice).toBeDefined();
+    });
+
+    it("400s on an unknown sort value", async () => {
+      const res = await app.inject({ method: "GET", url: "/personas?sort=bogus" });
+      expect(res.statusCode).toBe(400);
+      expect(res.json<{ error: { fieldErrors: Record<string, string[]> } }>().error.fieldErrors.sort).toBeDefined();
+    });
+
+    it("400s on unknown specialty and tier values", async () => {
+      expect((await app.inject({ method: "GET", url: "/personas?specialty=Cooking" })).statusCode).toBe(400);
+      expect((await app.inject({ method: "GET", url: "/personas?tier=Platinum" })).statusCode).toBe(400);
+    });
+
+    it("honours minPrice=0 instead of dropping it as falsy", async () => {
+      const search = jest.spyOn(db.personas, "search");
+      const res = await app.inject({ method: "GET", url: "/personas?minPrice=0" });
+      expect(res.statusCode).toBe(200);
+      expect(search).toHaveBeenCalledWith(expect.objectContaining({ minPrice: 0 }));
+    });
+
+    it("still coerces valid numeric prices", async () => {
+      const search = jest.spyOn(db.personas, "search");
+      const res = await app.inject({ method: "GET", url: "/personas?minPrice=10&maxPrice=50" });
+      expect(res.statusCode).toBe(200);
+      expect(search).toHaveBeenCalledWith(expect.objectContaining({ minPrice: 10, maxPrice: 50 }));
+    });
   });
 });
 

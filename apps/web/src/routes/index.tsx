@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "~/lib/api";
-import type { Persona } from "@acme/shared";
+import { personaFilterSchema, type Persona } from "@acme/shared";
 import { PersonaCard } from "~/components/PersonaCard";
 import { SearchBar } from "~/components/SearchBar";
 import { FilterPanel } from "~/components/FilterPanel";
 
-interface SearchParams {
+export interface SearchParams {
   q?: string;
   specialty?: string;
   tier?: string;
@@ -16,14 +16,18 @@ interface SearchParams {
 }
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): SearchParams => ({
-    q: (search.q as string) || undefined,
-    specialty: (search.specialty as string) || undefined,
-    tier: (search.tier as string) || undefined,
-    minPrice: search.minPrice ? Number(search.minPrice) : undefined,
-    maxPrice: search.maxPrice ? Number(search.maxPrice) : undefined,
-    sort: (search.sort as string) || undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): SearchParams => {
+    // Validate each field independently so one bad param (e.g. tier=Platinum
+    // or minPrice=abc) is dropped without discarding the rest of the search.
+    const result: SearchParams = {};
+    for (const key of Object.keys(personaFilterSchema.shape) as (keyof SearchParams)[]) {
+      const parsed = personaFilterSchema.shape[key].safeParse(search[key]);
+      if (parsed.success && parsed.data !== undefined && parsed.data !== "") {
+        (result as Record<string, unknown>)[key] = parsed.data;
+      }
+    }
+    return result;
+  },
   component: BrowsePage,
 });
 
