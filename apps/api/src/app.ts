@@ -18,7 +18,7 @@ export async function buildApp(options: BuildAppOptions = {}) {
   await app.register(cors, {
     origin: options.webOrigin ?? process.env.WEB_ORIGIN ?? "http://localhost:5173",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   });
   await app.register(jwt, { secret: "agentic-personas-dev-secret" });
 
