@@ -20,7 +20,9 @@ async function request<T>(
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    // Only declare a JSON payload when one is actually sent. Fastify rejects
+    // a body-less request that claims application/json with a 400.
+    ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}),
     ...((options.headers as Record<string, string>) ?? {}),
   };
 
