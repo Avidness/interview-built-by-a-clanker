@@ -41,7 +41,6 @@ export default defineConfig({
       env: {
         PORT: String(API_PORT),
         WEB_ORIGIN: WEB_URL,
-        ENFORCE_AUTH: "true",
       },
     },
     {
