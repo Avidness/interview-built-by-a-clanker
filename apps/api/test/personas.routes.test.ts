@@ -3,7 +3,9 @@ import type { Persona } from "@acme/shared";
 import { createTestApp } from "./helpers.js";
 
 let app: FastifyInstance;
-beforeAll(async () => { app = await createTestApp(); });
+beforeAll(async () => {
+  app = await createTestApp();
+});
 afterAll(() => app.close());
 
 describe("GET /personas", () => {

@@ -1,18 +1,10 @@
 import { test, expect } from "@playwright/test";
-import {
-  PERSONAS,
-  TOTAL_PERSONAS,
-  money,
-  personaCard,
-  personaCards,
-} from "./helpers";
+import { PERSONAS, TOTAL_PERSONAS, money, personaCard, personaCards } from "./helpers";
 
 test.describe("Browse personas", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("heading", { name: "Discover Agentic Personas" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Discover Agentic Personas" })).toBeVisible();
   });
 
   test("lists every seeded persona with name, tier and price", async ({ page }) => {

@@ -43,10 +43,7 @@ export function authHeaders(token: string): Record<string, string> {
 }
 
 /** Register a brand-new user straight against the API and return its token. */
-export async function registerViaApi(
-  request: APIRequestContext,
-  creds: Credentials = uniqueUser(),
-): Promise<Session> {
+export async function registerViaApi(request: APIRequestContext, creds: Credentials = uniqueUser()): Promise<Session> {
   const res = await request.post(`${API_URL}/auth/register`, { data: creds });
   expect(res.status(), "register should return 201").toBe(201);
   const body = (await res.json()) as { token: string; user: { id: string } };
@@ -87,12 +84,7 @@ export async function loginViaUi(page: Page, creds: Credentials) {
   await page.getByRole("button", { name: "Sign In" }).click();
 }
 
-export async function addToCartViaApi(
-  request: APIRequestContext,
-  token: string,
-  personaId: string,
-  quantity = 1,
-) {
+export async function addToCartViaApi(request: APIRequestContext, token: string, personaId: string, quantity = 1) {
   const res = await request.post(`${API_URL}/cart`, {
     headers: authHeaders(token),
     data: { personaId, quantity },
@@ -100,11 +92,7 @@ export async function addToCartViaApi(
   expect(res.ok(), `POST /cart should succeed (got ${res.status()})`).toBeTruthy();
 }
 
-export async function addFavoriteViaApi(
-  request: APIRequestContext,
-  token: string,
-  personaId: string,
-) {
+export async function addFavoriteViaApi(request: APIRequestContext, token: string, personaId: string) {
   const res = await request.post(`${API_URL}/favorites`, {
     headers: authHeaders(token),
     data: { personaId },
@@ -131,9 +119,7 @@ export function cartNavLink(page: Page) {
  * so we anchor on its sibling "Add to Cart" button.
  */
 export function favoriteToggle(page: Page) {
-  return page
-    .getByRole("button", { name: "Add to Cart" })
-    .locator("xpath=following-sibling::button[1]");
+  return page.getByRole("button", { name: "Add to Cart" }).locator("xpath=following-sibling::button[1]");
 }
 
 /** The <svg> inside the favorite toggle; filled red when favorited. */

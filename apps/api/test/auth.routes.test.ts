@@ -3,7 +3,9 @@ import type { AuthResponse } from "@acme/shared";
 import { createTestApp } from "./helpers.js";
 
 let app: FastifyInstance;
-beforeAll(async () => { app = await createTestApp(); });
+beforeAll(async () => {
+  app = await createTestApp();
+});
 afterAll(() => app.close());
 
 const creds = { username: "alice", email: "alice@example.com", password: "secret123" };
@@ -25,7 +27,8 @@ describe("POST /auth/register", () => {
 
   it("validates input with 400", async () => {
     const res = await app.inject({
-      method: "POST", url: "/auth/register",
+      method: "POST",
+      url: "/auth/register",
       payload: { username: "ab", email: "not-an-email", password: "123" },
     });
     expect(res.statusCode).toBe(400);
@@ -34,7 +37,11 @@ describe("POST /auth/register", () => {
 
 describe("POST /auth/login", () => {
   it("returns a token and the same public user shape as register", async () => {
-    const res = await app.inject({ method: "POST", url: "/auth/login", payload: { email: creds.email, password: creds.password } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: creds.email, password: creds.password },
+    });
     expect(res.statusCode).toBe(200);
     const body = res.json<AuthResponse>();
     expect(body.token).toEqual(expect.any(String));
@@ -42,19 +49,31 @@ describe("POST /auth/login", () => {
   });
 
   it("rejects a wrong password with 401", async () => {
-    const res = await app.inject({ method: "POST", url: "/auth/login", payload: { email: creds.email, password: "wrong" } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: creds.email, password: "wrong" },
+    });
     expect(res.statusCode).toBe(401);
   });
 
   it("rejects an unknown email with 401", async () => {
-    const res = await app.inject({ method: "POST", url: "/auth/login", payload: { email: "nobody@example.com", password: "x" } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: "nobody@example.com", password: "x" },
+    });
     expect(res.statusCode).toBe(401);
   });
 });
 
 describe("GET /auth/me", () => {
   it("returns the current user for a valid token", async () => {
-    const login = await app.inject({ method: "POST", url: "/auth/login", payload: { email: creds.email, password: creds.password } });
+    const login = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: creds.email, password: creds.password },
+    });
     const { token } = login.json<AuthResponse>();
     const res = await app.inject({ method: "GET", url: "/auth/me", headers: { authorization: `Bearer ${token}` } });
     expect(res.statusCode).toBe(200);

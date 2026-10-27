@@ -15,7 +15,12 @@ const getCart = async (u: TestUser = user) =>
 
 describe("cart routes", () => {
   it("require authentication", async () => {
-    for (const [method, url] of [["GET", "/cart"], ["POST", "/cart"], ["PUT", "/cart/x"], ["DELETE", "/cart/x"]] as const) {
+    for (const [method, url] of [
+      ["GET", "/cart"],
+      ["POST", "/cart"],
+      ["PUT", "/cart/x"],
+      ["DELETE", "/cart/x"],
+    ] as const) {
       const res = await app.inject({ method, url, payload: method === "GET" || method === "DELETE" ? undefined : {} });
       expect(`${method} ${url} -> ${res.statusCode}`).toBe(`${method} ${url} -> 401`);
     }
@@ -26,7 +31,9 @@ describe("cart routes", () => {
   });
 
   it("adds a persona and returns the enriched cart with a correct total", async () => {
-    const res = await app.inject(authed(user, { method: "POST", url: "/cart", payload: { personaId: "p-001", quantity: 2 } }));
+    const res = await app.inject(
+      authed(user, { method: "POST", url: "/cart", payload: { personaId: "p-001", quantity: 2 } }),
+    );
     expect(res.statusCode).toBe(200);
     const cart = res.json<Cart>();
     expect(cart.items).toHaveLength(1);
@@ -44,13 +51,17 @@ describe("cart routes", () => {
   it("404s when adding an unknown persona and 400s on a bad quantity", async () => {
     const missing = await app.inject(authed(user, { method: "POST", url: "/cart", payload: { personaId: "nope" } }));
     expect(missing.statusCode).toBe(404);
-    const bad = await app.inject(authed(user, { method: "POST", url: "/cart", payload: { personaId: "p-001", quantity: 0 } }));
+    const bad = await app.inject(
+      authed(user, { method: "POST", url: "/cart", payload: { personaId: "p-001", quantity: 0 } }),
+    );
     expect(bad.statusCode).toBe(400);
   });
 
   it("updates a line's quantity and recomputes the total", async () => {
     const { items } = await getCart();
-    const res = await app.inject(authed(user, { method: "PUT", url: `/cart/${items[0].id}`, payload: { quantity: 1 } }));
+    const res = await app.inject(
+      authed(user, { method: "PUT", url: `/cart/${items[0].id}`, payload: { quantity: 1 } }),
+    );
     expect(res.statusCode).toBe(200);
     const cart = res.json<Cart>();
     expect(cart.items[0].quantity).toBe(1);
@@ -70,7 +81,9 @@ describe("cart routes", () => {
     expect((await getCart(other)).items).toHaveLength(0);
 
     const { items } = await getCart();
-    const stolenUpdate = await app.inject(authed(other, { method: "PUT", url: `/cart/${items[0].id}`, payload: { quantity: 9 } }));
+    const stolenUpdate = await app.inject(
+      authed(other, { method: "PUT", url: `/cart/${items[0].id}`, payload: { quantity: 9 } }),
+    );
     expect(stolenUpdate.statusCode).toBe(404);
     const stolenDelete = await app.inject(authed(other, { method: "DELETE", url: `/cart/${items[0].id}` }));
     expect(stolenDelete.statusCode).toBe(404);
@@ -79,7 +92,8 @@ describe("cart routes", () => {
 
   it("allows the browser to preflight DELETE from the web origin", async () => {
     const res = await app.inject({
-      method: "OPTIONS", url: "/cart/some-id",
+      method: "OPTIONS",
+      url: "/cart/some-id",
       headers: { origin: "http://localhost:5173", "access-control-request-method": "DELETE" },
     });
     expect(res.statusCode).toBeLessThan(400);
