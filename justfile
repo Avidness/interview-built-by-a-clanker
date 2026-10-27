@@ -19,9 +19,9 @@ typecheck:
 lint:
     pnpm lint
 
-# Unit tests: API (Jest), web and shared (Vitest), via turbo
+# Unit tests: API (Jest), web and shared (Vitest), via turbo. Playwright lives in `just e2e`.
 test:
-    pnpm test
+    pnpm exec turbo test --filter=!@acme/e2e
 
 # Browser end-to-end tests (Playwright)
 e2e:
