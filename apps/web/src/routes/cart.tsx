@@ -82,7 +82,15 @@ function CartPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Cart</h1>
+      <div className="flex items-baseline justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Your Cart</h1>
+        <Link
+          to="/orders"
+          className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+        >
+          Orders
+        </Link>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1 space-y-4">

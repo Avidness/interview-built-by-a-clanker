@@ -19,18 +19,36 @@ const sortOptions = [
 interface FilterPanelProps {
   specialty?: string;
   tier?: string;
+  minPrice?: number;
+  maxPrice?: number;
   sort?: string;
   onSpecialtyChange: (v: string | undefined) => void;
   onTierChange: (v: string | undefined) => void;
+  onMinPriceChange: (v: number | undefined) => void;
+  onMaxPriceChange: (v: number | undefined) => void;
   onSortChange: (v: string | undefined) => void;
 }
+
+/** Parses a price input's text; empty or non-numeric text clears the filter. */
+function parsePrice(raw: string): number | undefined {
+  if (raw.trim() === "") return undefined;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
+const priceInputClass =
+  "w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none";
 
 export function FilterPanel({
   specialty,
   tier,
+  minPrice,
+  maxPrice,
   sort,
   onSpecialtyChange,
   onTierChange,
+  onMinPriceChange,
+  onMaxPriceChange,
   onSortChange,
 }: FilterPanelProps) {
   return (
@@ -72,6 +90,37 @@ export function FilterPanel({
               {t}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+          Price (per month)
+        </h3>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step={1}
+            aria-label="Min price"
+            placeholder="Min"
+            value={minPrice ?? ""}
+            onChange={(e) => onMinPriceChange(parsePrice(e.target.value))}
+            className={priceInputClass}
+          />
+          <span className="text-gray-400 text-sm">to</span>
+          <input
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step={1}
+            aria-label="Max price"
+            placeholder="Max"
+            value={maxPrice ?? ""}
+            onChange={(e) => onMaxPriceChange(parsePrice(e.target.value))}
+            className={priceInputClass}
+          />
         </div>
       </div>
 

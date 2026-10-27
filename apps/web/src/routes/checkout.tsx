@@ -70,6 +70,14 @@ function CheckoutPage() {
         >
           Continue Shopping
         </Link>
+        <p className="mt-6">
+          <Link
+            to="/orders"
+            className="text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            View your orders
+          </Link>
+        </p>
       </div>
     );
   }

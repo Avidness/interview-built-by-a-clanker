@@ -78,7 +78,7 @@ function FavoritesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {favorites.map((persona) => (
             <div key={persona.id} className="relative">
-              <PersonaCard persona={persona} />
+              <PersonaCard persona={persona} isFavorited />
               <button
                 onClick={() => removeFavorite.mutate(persona.id)}
                 className="absolute top-4 right-4 p-2 bg-white rounded-full shadow hover:bg-gray-50 transition-colors"
