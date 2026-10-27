@@ -16,7 +16,9 @@ const list = async (u: TestUser = user) =>
 describe("favorites routes", () => {
   it("require authentication", async () => {
     expect((await app.inject({ method: "GET", url: "/favorites" })).statusCode).toBe(401);
-    expect((await app.inject({ method: "POST", url: "/favorites", payload: { personaId: "p-001" } })).statusCode).toBe(401);
+    expect((await app.inject({ method: "POST", url: "/favorites", payload: { personaId: "p-001" } })).statusCode).toBe(
+      401,
+    );
   });
 
   it("start empty, then add and list full persona objects", async () => {
@@ -35,7 +37,10 @@ describe("favorites routes", () => {
 
   it("validates the persona", async () => {
     expect((await app.inject(authed(user, { method: "POST", url: "/favorites", payload: {} }))).statusCode).toBe(400);
-    expect((await app.inject(authed(user, { method: "POST", url: "/favorites", payload: { personaId: "nope" } }))).statusCode).toBe(404);
+    expect(
+      (await app.inject(authed(user, { method: "POST", url: "/favorites", payload: { personaId: "nope" } })))
+        .statusCode,
+    ).toBe(404);
   });
 
   it("400s (not 500s) on a missing, null or non-string body", async () => {

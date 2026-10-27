@@ -24,7 +24,9 @@ describe("POST /checkout", () => {
 
   it("validates customer details with 400", async () => {
     await app.inject(authed(user, { method: "POST", url: "/cart", payload: { personaId: "p-001" } }));
-    const res = await app.inject(authed(user, { method: "POST", url: "/checkout", payload: { name: "", email: "bad" } }));
+    const res = await app.inject(
+      authed(user, { method: "POST", url: "/checkout", payload: { name: "", email: "bad" } }),
+    );
     expect(res.statusCode).toBe(400);
   });
 
@@ -43,7 +45,9 @@ describe("POST /checkout", () => {
       customerEmail: customer.email,
       createdAt: expect.any(String),
     });
-    expect(order.items.map((i) => [i.personaId, i.quantity])).toEqual(before.items.map((i) => [i.personaId, i.quantity]));
+    expect(order.items.map((i) => [i.personaId, i.quantity])).toEqual(
+      before.items.map((i) => [i.personaId, i.quantity]),
+    );
     const expectedTotal = before.items.reduce((sum, i) => sum + i.persona.price * i.quantity, 0);
     expect(order.total).toBeCloseTo(expectedTotal, 2);
     expect(order.total).toBeCloseTo(before.total, 2);
