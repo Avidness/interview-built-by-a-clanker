@@ -38,7 +38,7 @@ Full list with triggers and evidence: `FINDINGS.md`.
 - Wide sweep: the repo is small (~2,700 source lines), so I read every source file myself and ran install, build and typecheck. `recon`, `test-runner` and `static-scanner` were not needed (no tests, no linter configured).
 - Deep dive: `bug-hunter` (Opus) on the API auth/cart/checkout/favorites flow, including a throwaway Fastify harness with `ENFORCE_AUTH=true` at `/private/tmp/claude-501/-Users-ness-projects-interview-built-by-a-clanker/53cd5b31-839d-4f4e-9be0-2f21e4d467db/scratchpad/harness.mts`. I re-ran it to confirm L1 and L2.
 - Found clean: PUT cart ownership, server-side totals and rounding, hook scoping, sort comparators, maxPrice/specialty/tier filters, SearchBar debounce.
-- Not covered: browser end-to-end testing. Port 5173 is held by a stale Vite server from `~/projects/todo` (PID 17807, started 2026-10-26), the storefront's Vite moved to 5174/5175, and the API only allows CORS from `http://localhost:5173`. The session was not permitted to stop that process. To rerun e2e: stop PID 17807, restart `pnpm --filter @acme/web dev`, and run the `e2e-tester` against http://localhost:5173. All frontend findings are confirmed by reading only.
+- Browser end-to-end: `e2e-tester` (Sonnet, Playwright) walked browse, register/login/logout, detail, cart, favorites, checkout and reload on http://localhost:5173. It confirmed B1, B2, L3, L4, L6, L7 and L8 by running. Cart editing, removal and checkout could not be reached from the UI because B1 returns 500 on every cart request, so L1, L2 and L13 rest on curl and the auth-enforced harness. (The first attempt was blocked by a stale Vite server from another project on port 5173; it was stopped at the user's request.)
 - No test-auditor: there is nothing to audit.
 
 ## Recommended next steps
@@ -47,4 +47,4 @@ Full list with triggers and evidence: `FINDINGS.md`.
 3. Fix the frontend data bugs: L3 price, L4 query key, L6 favorite toggle, B5 key collision, L8 logout, L9 badge key.
 4. Fix B2 (CORS DELETE), L5 (minPrice), L7 (login shape), B3 (export `SearchParams`), and wire `personaFilterSchema` and a favorites body schema (L10, B4).
 5. Add vitest to the API and web packages and run `typecheck` as part of `build` or CI so B3-class errors block merges.
-6. Stop the stale `todo` Vite server and run the browser e2e pass to confirm the frontend findings by running.
+6. After fixing B1, rerun the browser e2e pass to exercise cart editing, removal and checkout from the UI.
