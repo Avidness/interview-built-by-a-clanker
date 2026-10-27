@@ -1,36 +1,15 @@
 import type { FastifyInstance } from "fastify";
-import { addToCartSchema, updateCartItemSchema, type Cart, type CartItem } from "@acme/shared";
+import { addToCartSchema, updateCartItemSchema } from "@acme/shared";
 import { db } from "../db.js";
+import { buildCart } from "../lib/cart.js";
 import { authenticate } from "../middleware/auth.js";
-
-function enrichCartItems(userId: string): Cart {
-  const entries = db.cart.getByUserId(userId);
-  const items: CartItem[] = [];
-  let total = 0;
-
-  for (const entry of entries) {
-    const persona = db.personas.getById(entry.personaId);
-    if (!persona) continue;
-
-    items.push({
-      id: entry.id,
-      personaId: entry.personaId,
-      persona,
-      quantity: entry.quantity,
-    });
-
-    total += persona.price * entry.quantity;
-  }
-
-  return { items, total: Math.round(total * 100) / 100 };
-}
 
 export async function cartRoutes(app: FastifyInstance) {
   app.addHook("preHandler", authenticate);
 
   app.get("/cart", async (request) => {
     const { id: userId } = request.user as { id: string };
-    return enrichCartItems(userId);
+    return buildCart(userId);
   });
 
   app.post("/cart", async (request, reply) => {
@@ -48,7 +27,7 @@ export async function cartRoutes(app: FastifyInstance) {
     }
 
     db.cart.add(userId, personaId, quantity);
-    return enrichCartItems(userId);
+    return buildCart(userId);
   });
 
   app.put<{ Params: { itemId: string } }>(
@@ -66,7 +45,7 @@ export async function cartRoutes(app: FastifyInstance) {
       }
 
       db.cart.update(request.params.itemId, parsed.data.quantity);
-      return enrichCartItems(userId);
+      return buildCart(userId);
     }
   );
 
@@ -80,7 +59,7 @@ export async function cartRoutes(app: FastifyInstance) {
       }
 
       db.cart.remove(request.params.itemId);
-      return enrichCartItems(userId);
+      return buildCart(userId);
     }
   );
 }
