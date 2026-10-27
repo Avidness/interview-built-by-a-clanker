@@ -23,10 +23,7 @@ function FavoritesSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-white rounded-xl border p-6 animate-pulse h-48"
-        />
+        <div key={i} className="bg-white rounded-xl border p-6 animate-pulse h-48" />
       ))}
     </div>
   );
@@ -39,8 +36,7 @@ function FavoritesContents() {
   });
 
   const removeFavorite = useMutation({
-    mutationFn: (personaId: string) =>
-      api.delete(`/favorites/${personaId}`),
+    mutationFn: (personaId: string) => api.delete(`/favorites/${personaId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["favorites"] });
     },
@@ -51,13 +47,7 @@ function FavoritesContents() {
   }
 
   if (isError) {
-    return (
-      <ErrorState
-        title="Could not load your favorites"
-        error={error}
-        onRetry={() => refetch()}
-      />
-    );
+    return <ErrorState title="Could not load your favorites" error={error} onRetry={() => refetch()} />;
   }
 
   const favorites = data?.favorites ?? [];
@@ -68,13 +58,8 @@ function FavoritesContents() {
 
       {favorites.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 text-lg mb-4">
-            You haven't favorited any personas yet.
-          </p>
-          <Link
-            to="/"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
+          <p className="text-gray-500 text-lg mb-4">You haven't favorited any personas yet.</p>
+          <Link to="/" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Browse personas
           </Link>
         </div>
@@ -84,11 +69,13 @@ function FavoritesContents() {
             <div key={persona.id} className="relative">
               <PersonaCard persona={persona} isFavorited />
               <button
+                type="button"
                 onClick={() => removeFavorite.mutate(persona.id)}
                 className="absolute top-4 right-4 p-2 bg-white rounded-full shadow hover:bg-gray-50 transition-colors"
                 title="Remove from favorites"
               >
                 <svg
+                  aria-hidden="true"
                   className="w-5 h-5 text-red-500 fill-red-500"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

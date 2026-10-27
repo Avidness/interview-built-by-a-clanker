@@ -23,9 +23,7 @@ function RootLayout() {
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-2">
                 <span className="text-2xl">🤖</span>
-                <span className="text-xl font-bold text-gray-900">
-                  Agentic Personas
-                </span>
+                <span className="text-xl font-bold text-gray-900">Agentic Personas</span>
               </Link>
               <div className="hidden sm:flex items-center gap-4">
                 <Link
@@ -48,16 +46,8 @@ function RootLayout() {
             <div className="flex items-center gap-4">
               {user ? (
                 <>
-                  <Link
-                    to="/cart"
-                    className="relative text-gray-600 hover:text-gray-900 p-2 transition-colors"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <Link to="/cart" className="relative text-gray-600 hover:text-gray-900 p-2 transition-colors">
+                    <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -72,10 +62,9 @@ function RootLayout() {
                     )}
                   </Link>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">
-                      {user.username}
-                    </span>
+                    <span className="text-sm text-gray-600">{user.username}</span>
                     <button
+                      type="button"
                       onClick={() => {
                         logout();
                         router.navigate({ to: "/" });
@@ -88,10 +77,7 @@ function RootLayout() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link
-                    to="/login"
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                  >
+                  <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                     Sign in
                   </Link>
                   <Link

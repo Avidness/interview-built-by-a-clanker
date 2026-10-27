@@ -1,4 +1,4 @@
-import type { Persona, User, CartItem, Order } from "@acme/shared";
+import type { Persona, User, Order } from "@acme/shared";
 
 interface StoredUser extends User {
   passwordHash: string;
@@ -37,12 +37,7 @@ const seedPersonas: Persona[] = [
       "Refactor Rex dives deep into your codebase, identifying code smells, reducing complexity, and suggesting clean architectural patterns. Ideal for legacy codebases that need modernization.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Rex",
     specialty: "Engineering",
-    capabilities: [
-      "Code review",
-      "Complexity analysis",
-      "Design patterns",
-      "Technical debt reduction",
-    ],
+    capabilities: ["Code review", "Complexity analysis", "Design patterns", "Technical debt reduction"],
     price: 49.99,
     rating: 4.8,
     reviewCount: 234,
@@ -56,12 +51,7 @@ const seedPersonas: Persona[] = [
       "Zero-Day Zara performs thorough security audits across your entire stack. From SQL injection to XSS vulnerabilities, she catches what others miss before attackers do.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Zara",
     specialty: "Security",
-    capabilities: [
-      "Vulnerability scanning",
-      "Penetration testing",
-      "OWASP compliance",
-      "Security best practices",
-    ],
+    capabilities: ["Vulnerability scanning", "Penetration testing", "OWASP compliance", "Security best practices"],
     price: 89.99,
     rating: 4.9,
     reviewCount: 187,
@@ -75,12 +65,7 @@ const seedPersonas: Persona[] = [
       "Pipeline Pete automates your entire deployment pipeline. From build optimization to multi-environment deployments, Pete ensures your code ships fast and reliably.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Pete",
     specialty: "DevOps",
-    capabilities: [
-      "CI/CD pipelines",
-      "Docker orchestration",
-      "Infrastructure as code",
-      "Monitoring setup",
-    ],
+    capabilities: ["CI/CD pipelines", "Docker orchestration", "Infrastructure as code", "Monitoring setup"],
     price: 59.99,
     rating: 4.6,
     reviewCount: 312,
@@ -94,12 +79,7 @@ const seedPersonas: Persona[] = [
       "Priya transforms vague design briefs into pixel-perfect component libraries. She ensures consistency, accessibility, and visual harmony across your entire product.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Priya",
     specialty: "Design",
-    capabilities: [
-      "Design systems",
-      "Component libraries",
-      "Accessibility audits",
-      "Responsive design",
-    ],
+    capabilities: ["Design systems", "Component libraries", "Accessibility audits", "Responsive design"],
     price: 54.99,
     rating: 4.7,
     reviewCount: 156,
@@ -113,12 +93,7 @@ const seedPersonas: Persona[] = [
       "Query Quinn analyzes your database queries, identifies N+1 problems, suggests optimal indexing strategies, and rewrites slow queries for maximum performance.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Quinn",
     specialty: "Data",
-    capabilities: [
-      "Query optimization",
-      "Index strategy",
-      "Schema design",
-      "Migration planning",
-    ],
+    capabilities: ["Query optimization", "Index strategy", "Schema design", "Migration planning"],
     price: 69.99,
     rating: 4.5,
     reviewCount: 203,
@@ -132,12 +107,7 @@ const seedPersonas: Persona[] = [
       "Sam ruthlessly prioritizes features, writes crystal-clear user stories, and keeps your roadmap focused. No more feature bloat — just what your users actually need.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Sam",
     specialty: "Product",
-    capabilities: [
-      "User story writing",
-      "Roadmap planning",
-      "Prioritization frameworks",
-      "Stakeholder management",
-    ],
+    capabilities: ["User story writing", "Roadmap planning", "Prioritization frameworks", "Stakeholder management"],
     price: 44.99,
     rating: 4.3,
     reviewCount: 98,
@@ -151,12 +121,7 @@ const seedPersonas: Persona[] = [
       "Dana is a master debugger who traces issues through complex distributed systems. She reads stack traces like poetry and finds root causes in minutes, not hours.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Dana",
     specialty: "Engineering",
-    capabilities: [
-      "Root cause analysis",
-      "Log analysis",
-      "Distributed tracing",
-      "Performance profiling",
-    ],
+    capabilities: ["Root cause analysis", "Log analysis", "Distributed tracing", "Performance profiling"],
     price: 59.99,
     rating: 4.9,
     reviewCount: 445,
@@ -170,12 +135,7 @@ const seedPersonas: Persona[] = [
       "Tina provisions and manages cloud infrastructure with elegant, modular Terraform configurations. Multi-cloud, multi-region — she handles it all with grace.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Tina",
     specialty: "DevOps",
-    capabilities: [
-      "Terraform modules",
-      "AWS/GCP/Azure",
-      "Cost optimization",
-      "Disaster recovery",
-    ],
+    capabilities: ["Terraform modules", "AWS/GCP/Azure", "Cost optimization", "Disaster recovery"],
     price: 79.99,
     rating: 4.4,
     reviewCount: 178,
@@ -189,12 +149,7 @@ const seedPersonas: Persona[] = [
       "Alex audits your web application against WCAG guidelines, fixes accessibility violations, and ensures every user can navigate your product regardless of ability.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Alex",
     specialty: "Design",
-    capabilities: [
-      "WCAG compliance",
-      "Screen reader testing",
-      "Keyboard navigation",
-      "Color contrast analysis",
-    ],
+    capabilities: ["WCAG compliance", "Screen reader testing", "Keyboard navigation", "Color contrast analysis"],
     price: 39.99,
     rating: 4.6,
     reviewCount: 132,
@@ -208,12 +163,7 @@ const seedPersonas: Persona[] = [
       "Dashiell turns raw data into actionable dashboards. He selects the right chart types, designs intuitive layouts, and connects live data sources for real-time insights.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Dashiell",
     specialty: "Data",
-    capabilities: [
-      "Dashboard design",
-      "Data visualization",
-      "ETL pipelines",
-      "Real-time analytics",
-    ],
+    capabilities: ["Dashboard design", "Data visualization", "ETL pipelines", "Real-time analytics"],
     price: 64.99,
     rating: 4.2,
     reviewCount: 89,
@@ -227,12 +177,7 @@ const seedPersonas: Persona[] = [
       "Carl navigates the maze of SOC2, GDPR, HIPAA, and other regulatory frameworks. He generates audit-ready documentation and identifies compliance gaps before auditors do.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Carl",
     specialty: "Security",
-    capabilities: [
-      "SOC2 preparation",
-      "GDPR compliance",
-      "Policy generation",
-      "Risk assessment",
-    ],
+    capabilities: ["SOC2 preparation", "GDPR compliance", "Policy generation", "Risk assessment"],
     price: 99.99,
     rating: 4.7,
     reviewCount: 67,
@@ -265,12 +210,7 @@ const seedPersonas: Persona[] = [
       "Theo generates comprehensive test suites — unit, integration, and E2E. He identifies untested edge cases and creates fixtures that mirror real-world data.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Theo",
     specialty: "Engineering",
-    capabilities: [
-      "Test generation",
-      "Coverage analysis",
-      "E2E test suites",
-      "Mock data creation",
-    ],
+    capabilities: ["Test generation", "Coverage analysis", "E2E test suites", "Mock data creation"],
     price: 54.99,
     rating: 4.5,
     reviewCount: 289,
@@ -284,12 +224,7 @@ const seedPersonas: Persona[] = [
       "Max handles the heavy lifting of major migrations — React class to hooks, REST to GraphQL, monolith to microservices. He plans incremental steps to avoid big-bang rewrites.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Max",
     specialty: "Engineering",
-    capabilities: [
-      "Framework migration",
-      "Incremental refactoring",
-      "API transformation",
-      "Dependency upgrades",
-    ],
+    capabilities: ["Framework migration", "Incremental refactoring", "API transformation", "Dependency upgrades"],
     price: 74.99,
     rating: 4.3,
     reviewCount: 112,
@@ -303,12 +238,7 @@ const seedPersonas: Persona[] = [
       "Mia instruments your product with the right analytics events, builds funnels, and identifies drop-off points. She turns data into growth hypotheses you can actually test.",
     avatarUrl: "https://api.dicebear.com/9.x/bottts/svg?seed=Mia",
     specialty: "Product",
-    capabilities: [
-      "Analytics instrumentation",
-      "Funnel analysis",
-      "A/B test design",
-      "Growth modeling",
-    ],
+    capabilities: ["Analytics instrumentation", "Funnel analysis", "A/B test design", "Growth modeling"],
     price: 49.99,
     rating: 4.4,
     reviewCount: 201,
@@ -349,7 +279,7 @@ export const db = {
             p.name.toLowerCase().includes(query) ||
             p.tagline.toLowerCase().includes(query) ||
             p.description.toLowerCase().includes(query) ||
-            p.capabilities.some((c) => c.toLowerCase().includes(query))
+            p.capabilities.some((c) => c.toLowerCase().includes(query)),
         );
       }
 
@@ -405,16 +335,14 @@ export const db = {
 
   cart: {
     getByUserId(userId: string): CartEntry[] {
-      return Array.from(cartItems.values()).filter(
-        (item) => item.userId === userId
-      );
+      return Array.from(cartItems.values()).filter((item) => item.userId === userId);
     },
     getById(id: string): CartEntry | undefined {
       return cartItems.get(id);
     },
     add(userId: string, personaId: string, quantity: number): CartEntry {
       const existing = Array.from(cartItems.values()).find(
-        (item) => item.userId === userId && item.personaId === personaId
+        (item) => item.userId === userId && item.personaId === personaId,
       );
 
       if (existing) {

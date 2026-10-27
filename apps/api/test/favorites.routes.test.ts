@@ -45,7 +45,9 @@ describe("favorites routes", () => {
 
   it("400s (not 500s) on a missing, null or non-string body", async () => {
     const post = (payload?: unknown) =>
-      app.inject(authed(user, { method: "POST", url: "/favorites", payload, headers: { "content-type": "application/json" } }));
+      app.inject(
+        authed(user, { method: "POST", url: "/favorites", payload, headers: { "content-type": "application/json" } }),
+      );
 
     const missing = await post(undefined);
     expect(missing.statusCode).toBe(400);
@@ -55,7 +57,9 @@ describe("favorites routes", () => {
 
     const notString = await post({ personaId: 123 });
     expect(notString.statusCode).toBe(400);
-    expect(notString.json<{ error: { fieldErrors: Record<string, string[]> } }>().error.fieldErrors.personaId).toBeDefined();
+    expect(
+      notString.json<{ error: { fieldErrors: Record<string, string[]> } }>().error.fieldErrors.personaId,
+    ).toBeDefined();
 
     const empty = await post({ personaId: "" });
     expect(empty.statusCode).toBe(400);

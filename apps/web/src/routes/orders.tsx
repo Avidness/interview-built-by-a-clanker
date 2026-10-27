@@ -46,13 +46,8 @@ function OrdersPage() {
   if (!user) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Sign in to view your orders
-        </h2>
-        <Link
-          to="/login"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign in to view your orders</h2>
+        <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
           Go to sign in
         </Link>
       </div>
@@ -72,35 +67,23 @@ function OrdersPage() {
 
       {orders.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 text-lg mb-4">
-            You haven't placed any orders yet.
-          </p>
-          <Link
-            to="/"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
+          <p className="text-gray-500 text-lg mb-4">You haven't placed any orders yet.</p>
+          <Link to="/" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Browse personas
           </Link>
         </div>
       ) : (
         <ul className="space-y-4">
           {orders.map((order) => (
-            <li
-              key={order.id}
-              className="bg-white rounded-xl border border-gray-200 p-6"
-            >
+            <li key={order.id} className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
                 <div>
                   <p className="font-mono text-sm text-gray-900">{order.id}</p>
                   <p className="text-sm text-gray-500">
-                    <time dateTime={order.createdAt}>
-                      {formatDate(order.createdAt)}
-                    </time>
+                    <time dateTime={order.createdAt}>{formatDate(order.createdAt)}</time>
                   </p>
                 </div>
-                <p className="text-lg font-bold text-gray-900">
-                  ${order.total.toFixed(2)}
-                </p>
+                <p className="text-lg font-bold text-gray-900">${order.total.toFixed(2)}</p>
               </div>
               <ul className="space-y-1 border-t pt-3">
                 {order.items.map((item) => (
@@ -108,9 +91,7 @@ function OrdersPage() {
                     <span className="text-gray-700">
                       {item.persona.name} x{item.quantity}
                     </span>
-                    <span className="text-gray-900">
-                      ${(item.persona.price * item.quantity).toFixed(2)}
-                    </span>
+                    <span className="text-gray-900">${(item.persona.price * item.quantity).toFixed(2)}</span>
                   </li>
                 ))}
               </ul>

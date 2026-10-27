@@ -41,12 +41,8 @@ export function PersonaCard({ persona, isFavorited = false }: PersonaCardProps) 
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-gray-900 truncate">
-              {persona.name}
-            </h3>
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${tierColors[persona.tier]}`}
-            >
+            <h3 className="font-semibold text-gray-900 truncate">{persona.name}</h3>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${tierColors[persona.tier]}`}>
               {persona.tier}
             </span>
           </div>
@@ -56,26 +52,19 @@ export function PersonaCard({ persona, isFavorited = false }: PersonaCardProps) 
 
       <div className="flex flex-wrap gap-1.5 mb-4">
         {persona.capabilities.slice(0, 3).map((cap) => (
-          <span
-            key={cap}
-            className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
-          >
+          <span key={cap} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
             {cap}
           </span>
         ))}
         {persona.capabilities.length > 3 && (
-          <span className="text-xs text-gray-400 px-2 py-1">
-            +{persona.capabilities.length - 3} more
-          </span>
+          <span className="text-xs text-gray-400 px-2 py-1">+{persona.capabilities.length - 3} more</span>
         )}
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StarRating rating={persona.rating} size="sm" />
-          <span className="text-xs text-gray-400">
-            ({persona.reviewCount})
-          </span>
+          <span className="text-xs text-gray-400">({persona.reviewCount})</span>
         </div>
         <p className="text-lg font-bold text-gray-900">
           ${persona.price.toFixed(2)}

@@ -13,10 +13,7 @@ test.describe("Mobile navigation (GAPS 1.4)", () => {
     await expect(page).toHaveURL("/");
   });
 
-  test("signed-in users can reach Favorites from the nav on a phone-sized screen", async ({
-    page,
-    request,
-  }) => {
+  test("signed-in users can reach Favorites from the nav on a phone-sized screen", async ({ page, request }) => {
     await loginAs(page, request);
     const favorites = page.getByRole("navigation").getByRole("link", { name: "Favorites" });
     await expect(favorites).toBeVisible();

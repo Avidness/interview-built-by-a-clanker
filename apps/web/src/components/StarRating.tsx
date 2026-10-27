@@ -17,6 +17,7 @@ export function StarRating({ rating, size = "md" }: StarRatingProps) {
         const fill = Math.min(1, Math.max(0, rating - i));
         return (
           <svg
+            aria-hidden="true"
             key={i}
             className={`${starSize} ${fill > 0 ? "text-yellow-400" : "text-gray-200"}`}
             fill={fill >= 1 ? "currentColor" : fill > 0 ? `url(#${gradientId})` : "none"}

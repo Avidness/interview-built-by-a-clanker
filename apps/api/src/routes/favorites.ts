@@ -39,15 +39,12 @@ export async function favoriteRoutes(app: FastifyInstance) {
     return { success: true };
   });
 
-  app.delete<{ Params: { personaId: string } }>(
-    "/favorites/:personaId",
-    async (request, reply) => {
-      const { id: userId } = request.user as { id: string };
-      const removed = db.favorites.remove(userId, request.params.personaId);
-      if (!removed) {
-        return reply.status(404).send({ error: "Favorite not found" });
-      }
-      return { success: true };
+  app.delete<{ Params: { personaId: string } }>("/favorites/:personaId", async (request, reply) => {
+    const { id: userId } = request.user as { id: string };
+    const removed = db.favorites.remove(userId, request.params.personaId);
+    if (!removed) {
+      return reply.status(404).send({ error: "Favorite not found" });
     }
-  );
+    return { success: true };
+  });
 }

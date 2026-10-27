@@ -3,13 +3,6 @@ import { PERSONAS, TOTAL_PERSONAS, personaCard, personaCards } from "./helpers";
 
 // Seed prices (apps/api/src/db.ts): 34.99, 39.99, 44.99, 49.99 x2, 54.99 x2,
 // 59.99 x2, 64.99, 69.99, 74.99, 79.99, 89.99, 99.99.
-//
-// Typing into the inputs updates the URL immediately, but the grid only
-// refreshes once BUGS.md D1 (browse page never refetches when filters change)
-// is fixed, and `minPrice` only works once B2 (`minPrice` is an upper bound)
-// is fixed. Those tests are marked fixme until both land.
-const D1 = "blocked by BUGS.md D1: the browse page does not refetch when filters change";
-const B2 = "blocked by BUGS.md B2: the API treats minPrice as an upper bound";
 
 test.describe("Price range filter", () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +11,6 @@ test.describe("Price range filter", () => {
   });
 
   test("filters by minimum price", async ({ page }) => {
-    test.fixme(true, `${D1}; ${B2}`);
     await page.getByLabel("Min price").fill("80");
     await expect(page).toHaveURL(/minPrice=80/);
 
@@ -28,7 +20,6 @@ test.describe("Price range filter", () => {
   });
 
   test("filters by maximum price", async ({ page }) => {
-    test.fixme(true, D1);
     await page.getByLabel("Max price").fill("40");
     await expect(page).toHaveURL(/maxPrice=40/);
 
@@ -38,7 +29,6 @@ test.describe("Price range filter", () => {
   });
 
   test("combines min and max into a range", async ({ page }) => {
-    test.fixme(true, `${D1}; ${B2}`);
     await page.getByLabel("Min price").fill("50");
     await page.getByLabel("Max price").fill("60");
     await expect(page).toHaveURL(/minPrice=50/);
@@ -49,7 +39,6 @@ test.describe("Price range filter", () => {
   });
 
   test("clearing the input removes the param and restores the full list", async ({ page }) => {
-    test.fixme(true, D1);
     await page.getByLabel("Max price").fill("40");
     await expect(personaCards(page)).toHaveCount(2);
 
