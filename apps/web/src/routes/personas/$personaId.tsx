@@ -3,6 +3,11 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
+import {
+  FAVORITES_QUERY_KEY,
+  favoriteIdsQueryOptions,
+  toggleFavorite as toggleFavoriteRequest,
+} from "~/lib/favorites";
 import { StarRating } from "~/components/StarRating";
 import type { Persona, Cart } from "@acme/shared";
 
@@ -19,13 +24,7 @@ function PersonaDetailPage() {
     queryFn: () => api.get<Persona>(`/personas/${personaId}`),
   });
 
-  const { data: favorites = [] } = useQuery({
-    queryKey: ["favorites"],
-    queryFn: async () => {
-      const res = await api.get<{ favorites: Persona[] }>("/favorites");
-      return res.favorites.map((p) => p.id);
-    },
-  });
+  const { data: favorites = [] } = useQuery(favoriteIdsQueryOptions());
 
   const isFavorited = favorites.includes(personaId);
 
@@ -38,12 +37,9 @@ function PersonaDetailPage() {
   });
 
   const toggleFavorite = useMutation({
-    mutationFn: () =>
-      !isFavorited
-        ? api.delete(`/favorites/${personaId}`)
-        : api.post("/favorites", { personaId }),
+    mutationFn: () => toggleFavoriteRequest(personaId, isFavorited),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY });
     },
   });
 
