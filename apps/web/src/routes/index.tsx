@@ -5,6 +5,7 @@ import { personaFilterSchema, type Persona } from "@acme/shared";
 import { PersonaCard } from "~/components/PersonaCard";
 import { SearchBar } from "~/components/SearchBar";
 import { FilterPanel } from "~/components/FilterPanel";
+import { ErrorState } from "~/components/ErrorState";
 
 export interface SearchParams {
   q?: string;
@@ -43,7 +44,13 @@ function BrowsePage() {
   if (search.maxPrice) queryString.set("maxPrice", String(search.maxPrice));
   if (search.sort) queryString.set("sort", search.sort);
 
-  const { data: personas = [], isLoading } = useQuery({
+  const {
+    data: personas = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["personas"],
     queryFn: () => {
       const qs = queryString.toString();
@@ -108,6 +115,12 @@ function BrowsePage() {
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <ErrorState
+              title="Could not load personas"
+              error={error}
+              onRetry={() => refetch()}
+            />
           ) : personas.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-gray-500 text-lg">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -8,6 +8,13 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange }: SearchBarProps) {
   const [local, setLocal] = useState(value);
 
+  // Keep the latest onChange in a ref so a parent re-render that passes a new
+  // function does not restart the pending debounce timer.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   useEffect(() => {
     setLocal(value);
   }, [value]);
@@ -15,11 +22,11 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (local !== value) {
-        onChange(local);
+        onChangeRef.current(local);
       }
     }, 300);
     return () => clearTimeout(timer);
-  }, [local, value, onChange]);
+  }, [local, value]);
 
   return (
     <div className="relative">

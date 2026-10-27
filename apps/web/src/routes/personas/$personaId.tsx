@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { api } from "~/lib/api";
+import { api, ApiError } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
 import { StarRating } from "~/components/StarRating";
+import { ErrorState } from "~/components/ErrorState";
 import type { Persona, Cart } from "@acme/shared";
 
 export const Route = createFileRoute("/personas/$personaId")({
@@ -14,7 +15,13 @@ function PersonaDetailPage() {
   const { personaId } = Route.useParams();
   const { user } = useAuth();
 
-  const { data: persona, isLoading } = useQuery({
+  const {
+    data: persona,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["persona", personaId],
     queryFn: () => api.get<Persona>(`/personas/${personaId}`),
   });
@@ -54,6 +61,18 @@ function PersonaDetailPage() {
         <div className="h-4 bg-gray-200 rounded w-2/3 mb-8" />
         <div className="h-64 bg-gray-200 rounded" />
       </div>
+    );
+  }
+
+  const isNotFound = error instanceof ApiError && error.status === 404;
+
+  if (isError && !isNotFound) {
+    return (
+      <ErrorState
+        title="Could not load this persona"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 
