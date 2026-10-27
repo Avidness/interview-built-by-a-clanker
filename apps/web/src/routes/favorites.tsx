@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
+import { FAVORITES_QUERY_KEY, favoritesQueryOptions } from "~/lib/favorites";
 import { AuthGate } from "~/components/AuthGate";
 import { queryClient } from "~/lib/queryClient";
 import { PersonaCard } from "~/components/PersonaCard";
@@ -30,15 +31,12 @@ function FavoritesSkeleton() {
 }
 
 function FavoritesContents() {
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["favorites"],
-    queryFn: () => api.get<{ favorites: Persona[] }>("/favorites"),
-  });
+  const { data, isLoading, isError, error, refetch } = useQuery(favoritesQueryOptions(true));
 
   const removeFavorite = useMutation({
     mutationFn: (personaId: string) => api.delete(`/favorites/${personaId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY });
     },
   });
 

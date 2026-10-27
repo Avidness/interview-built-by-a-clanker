@@ -8,7 +8,9 @@ const validate = Route.options.validateSearch as (search: Record<string, unknown
 
 describe("browse route validateSearch", () => {
   it("keeps valid params and coerces prices to numbers", () => {
-    expect(validate({ q: "rex", specialty: "Design", tier: "Pro", minPrice: "10", maxPrice: "50", sort: "price-asc" })).toEqual({
+    expect(
+      validate({ q: "rex", specialty: "Design", tier: "Pro", minPrice: "10", maxPrice: "50", sort: "price-asc" }),
+    ).toEqual({
       q: "rex",
       specialty: "Design",
       tier: "Pro",
@@ -19,7 +21,9 @@ describe("browse route validateSearch", () => {
   });
 
   it("drops unknown enum values and non-numeric prices without discarding the rest", () => {
-    expect(validate({ q: "rex", tier: "Platinum", specialty: "Magic", sort: "bogus", minPrice: "abc" })).toEqual({ q: "rex" });
+    expect(validate({ q: "rex", tier: "Platinum", specialty: "Magic", sort: "bogus", minPrice: "abc" })).toEqual({
+      q: "rex",
+    });
   });
 
   it("drops empty strings and unknown keys", () => {

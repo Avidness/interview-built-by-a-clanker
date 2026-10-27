@@ -14,7 +14,7 @@ The **Ref** column maps each row to those note ids so nothing is lost. Evidence 
 
 ## Status on `feat/gaps` (2026-10-27)
 
-All checks green: `just check` (lint, typecheck, unit), API Jest 68 passed, web Vitest 41 passed, shared Vitest 15 passed, Playwright e2e 65 passed.
+All checks green: `just check` (lint, typecheck, unit), API Jest 68 passed, web Vitest 43 passed, shared Vitest 15 passed, Playwright e2e 65 passed.
 
 | Rows | Fixed on | Tests |
 |---|---|---|
@@ -23,7 +23,7 @@ All checks green: `just check` (lint, typecheck, unit), API Jest 68 passed, web 
 | G4, G5, G7, L16 | `f3f49b7` (Agent B) | e2e `error-states`, `mobile-nav`, `checkout` prefill, `browse` debounce; web `SearchBar.test.tsx` |
 | G1, G2, G3 | `6b408d1` (Agent C) | API `orders.routes.test.ts`; e2e `orders`, `price-filter`, `favorite-indicator` |
 | G8, C1, C2, C3, C4 | `7a6a862`, `8278947`, `868ad27`, `c295ef4`, `281d1cc` (Agent D), lint clean at `ac7c806` | `auth.default-config.test.ts`, `schemas.test.ts`, `StarRating.test.tsx` |
-| B5 | `merge/consolidated` (`lib/favorites.ts` separates the two favorites queries) | web `lib/favorites.test.ts` |
+| B5 | `feat/gaps` (`favoritesQueryOptions` and `favoriteIdsQueryOptions` now use distinct keys under the shared `["favorites"]` prefix) | web `lib/favorites.test.ts › favorites query keys (FINDINGS B5)` |
 
 Still open: L11 (email case), L12 (JWT expiry, secret, ids), L19 (hash, rate limit), G6 (pricing copy versus model, product decision), C5 (Jest shared mapping).
 

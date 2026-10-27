@@ -1,6 +1,6 @@
 # Functionality Gaps — Agentic Personas Storefront
 
-_Written 2026-10-27; status updated the same day on `feat/gaps` (all checks green: `just check`, 68 API + 41 web + 15 shared unit tests, 65 e2e). Companion to `BUGS.md`. This file lists things the code **intends** to do (per schemas, DB helpers, README, or UI affordances) but does not actually deliver, plus robustness and security gaps a reviewer would expect in a storefront. None of these are the planted bugs; they are judgement calls about what "working" should mean._
+_Written 2026-10-27; status updated the same day on `feat/gaps` (all checks green: `just check`, 68 API + 43 web + 15 shared unit tests, 65 e2e). Companion to `BUGS.md`. This file lists things the code **intends** to do (per schemas, DB helpers, README, or UI affordances) but does not actually deliver, plus robustness and security gaps a reviewer would expect in a storefront. None of these are the planted bugs; they are judgement calls about what "working" should mean._
 
 ---
 
