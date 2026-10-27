@@ -30,6 +30,26 @@ describe("GET /personas", () => {
     expect(body.every((p) => p.price >= 60)).toBe(true);
   });
 
+  it.each([
+    ["specialty=Cooking", "unknown specialty"],
+    ["tier=Platinum", "unknown tier"],
+    ["sort=random", "unknown sort"],
+    ["minPrice=abc", "non-numeric minPrice"],
+    ["maxPrice=1e999x", "non-numeric maxPrice"],
+  ])("rejects ?%s (%s) with 400 via the shared filter schema", async (qs) => {
+    const res = await app.inject({ method: "GET", url: `/personas?${qs}` });
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toHaveProperty("error");
+  });
+
+  it("coerces numeric query strings for the price range", async () => {
+    const res = await app.inject({ method: "GET", url: "/personas?minPrice=40&maxPrice=80" });
+    expect(res.statusCode).toBe(200);
+    const body = res.json<Persona[]>();
+    expect(body.length).toBeGreaterThan(0);
+    expect(body.every((p) => p.price >= 40 && p.price <= 80)).toBe(true);
+  });
+
   it("returns an empty list, not an error, when nothing matches", async () => {
     const res = await app.inject({ method: "GET", url: "/personas?q=definitely-not-a-persona-xyz" });
     expect(res.statusCode).toBe(200);
