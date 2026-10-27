@@ -6,8 +6,11 @@ The app builds, but the main flows are broken end to end: with the default confi
 | | Critical | High | Medium | Low | Total |
 |---|---|---|---|---|---|
 | Broken | 1 | 3 | 1 | 0 | 5 |
-| Logic issues | 3 | 5 | 4 | 3 | 15 |
-| Coverage gaps | 0 | 1 | 1 | 0 | 2 |
+| Logic issues | 3 | 5 | 5 | 6 | 19 |
+| Gaps (intended, not built) | 0 | 0 | 2 | 6 | 8 |
+| Coverage gaps | 0 | 2 | 3 | 0 | 5 |
+
+`FINDINGS.md` now consolidates this session's results with `AGENT_NOTES/BUGS.md` and `AGENT_NOTES/GAPS.md`; every row carries a **Ref** back to those note ids. The uncommitted Jest and Playwright suites in the working tree fail on the same bugs (API 7 of 50, e2e 16 of 42), which is independent confirmation of L1, L2, L5, L7, B2, L3, L4, L6, L8, L9 and L13.
 
 ## Top findings
 
@@ -39,12 +42,12 @@ Full list with triggers and evidence: `FINDINGS.md`.
 - Deep dive: `bug-hunter` (Opus) on the API auth/cart/checkout/favorites flow, including a throwaway Fastify harness with `ENFORCE_AUTH=true` at `/private/tmp/claude-501/-Users-ness-projects-interview-built-by-a-clanker/53cd5b31-839d-4f4e-9be0-2f21e4d467db/scratchpad/harness.mts`. I re-ran it to confirm L1 and L2.
 - Found clean: PUT cart ownership, server-side totals and rounding, hook scoping, sort comparators, maxPrice/specialty/tier filters, SearchBar debounce.
 - Browser end-to-end: `e2e-tester` (Sonnet, Playwright) walked browse, register/login/logout, detail, cart, favorites, checkout and reload on http://localhost:5173. It confirmed B1, B2, L3, L4, L6, L7 and L8 by running. Cart editing, removal and checkout could not be reached from the UI because B1 returns 500 on every cart request, so L1, L2 and L13 rest on curl and the auth-enforced harness. (The first attempt was blocked by a stale Vite server from another project on port 5173; it was stopped at the user's request.)
-- No test-auditor: there is nothing to audit.
+- No test-auditor: nothing is committed to audit. The working-tree suites were reviewed by reading: their one blind spot is B1 (both force `ENFORCE_AUTH=true`).
 
 ## Recommended next steps
 1. Fix B1 (auth middleware) first; nothing user-scoped can be exercised until it works. Decide whether no-auth mode should exist at all.
 2. Fix L1 (cart IDOR) and L2 (clear cart on checkout), and add `app.inject` route tests for both.
 3. Fix the frontend data bugs: L3 price, L4 query key, L6 favorite toggle, B5 key collision, L8 logout, L9 badge key.
 4. Fix B2 (CORS DELETE), L5 (minPrice), L7 (login shape), B3 (export `SearchParams`), and wire `personaFilterSchema` and a favorites body schema (L10, B4).
-5. Add vitest to the API and web packages and run `typecheck` as part of `build` or CI so B3-class errors block merges.
+5. Commit the working-tree test suites, add a test for B1 with the flag unset, add a lint config, and run `typecheck` in CI so B3-class errors block merges.
 6. After fixing B1, rerun the browser e2e pass to exercise cart editing, removal and checkout from the UI.
