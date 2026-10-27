@@ -25,7 +25,7 @@ function PersonaDetailPage() {
     queryFn: () => api.get<Persona>(`/personas/${personaId}`),
   });
 
-  const { data: favorites = [] } = useQuery(favoriteIdsQueryOptions());
+  const { data: favorites = [] } = useQuery(favoriteIdsQueryOptions(!!user));
 
   const isFavorited = favorites.includes(personaId);
 

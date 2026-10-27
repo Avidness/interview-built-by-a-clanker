@@ -100,4 +100,12 @@ describe("PersonaDetailPage favorites", () => {
     await waitFor(() => expect(api.delete).toHaveBeenCalledWith("/favorites/p-001"));
     expect(api.post).not.toHaveBeenCalled();
   });
+
+  it("does not request favorites for a guest", async () => {
+    state.user = null;
+    await renderPage();
+
+    expect(screen.getByText(/to add to cart or save as favorite/)).toBeInTheDocument();
+    expect(api.get).not.toHaveBeenCalledWith("/favorites");
+  });
 });

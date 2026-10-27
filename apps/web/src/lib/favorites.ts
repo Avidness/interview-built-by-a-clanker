@@ -10,13 +10,14 @@ export function toggleFavorite(personaId: string, isFavorited: boolean) {
     : api.post<{ success: boolean }>("/favorites", { personaId });
 }
 
-/** The current user's favorite persona ids. */
-export function favoriteIdsQueryOptions() {
+/** The current user's favorite persona ids. Only fetched when signed in. */
+export function favoriteIdsQueryOptions(isSignedIn: boolean) {
   return {
     queryKey: FAVORITES_QUERY_KEY,
     queryFn: async () => {
       const res = await api.get<{ favorites: Persona[] }>("/favorites");
       return res.favorites.map((p) => p.id);
     },
+    enabled: isSignedIn,
   };
 }

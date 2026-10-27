@@ -29,7 +29,12 @@ describe("favoriteIdsQueryOptions", () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       favorites: [{ id: "p-001" }, { id: "p-007" }],
     });
-    await expect(favoriteIdsQueryOptions().queryFn()).resolves.toEqual(["p-001", "p-007"]);
+    await expect(favoriteIdsQueryOptions(true).queryFn()).resolves.toEqual(["p-001", "p-007"]);
     expect(api.get).toHaveBeenCalledWith("/favorites");
+  });
+
+  it("is disabled for guests so the page never sends an unauthenticated request", () => {
+    expect(favoriteIdsQueryOptions(false).enabled).toBe(false);
+    expect(favoriteIdsQueryOptions(true).enabled).toBe(true);
   });
 });
