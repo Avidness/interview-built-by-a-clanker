@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
-import { useAuth } from "~/lib/auth";
+import { AuthGate } from "~/components/AuthGate";
 import { queryClient } from "~/lib/queryClient";
 import { PersonaCard } from "~/components/PersonaCard";
 import { ErrorState } from "~/components/ErrorState";
@@ -12,12 +12,30 @@ export const Route = createFileRoute("/favorites")({
 });
 
 function FavoritesPage() {
-  const { user } = useAuth();
+  return (
+    <AuthGate title="Sign in to view favorites" fallback={<FavoritesSkeleton />}>
+      <FavoritesContents />
+    </AuthGate>
+  );
+}
 
+function FavoritesSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-xl border p-6 animate-pulse h-48"
+        />
+      ))}
+    </div>
+  );
+}
+
+function FavoritesContents() {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["favorites"],
     queryFn: () => api.get<{ favorites: Persona[] }>("/favorites"),
-    enabled: !!user,
   });
 
   const removeFavorite = useMutation({
@@ -28,33 +46,8 @@ function FavoritesPage() {
     },
   });
 
-  if (!user) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Sign in to view favorites
-        </h2>
-        <Link
-          to="/login"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
-          Go to sign in
-        </Link>
-      </div>
-    );
-  }
-
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-xl border p-6 animate-pulse h-48"
-          />
-        ))}
-      </div>
-    );
+    return <FavoritesSkeleton />;
   }
 
   if (isError) {

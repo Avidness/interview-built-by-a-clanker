@@ -1,20 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "~/lib/api";
-import { personaFilterSchema, type Persona } from "@acme/shared";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { personasQueryOptions, type PersonaSearch } from "~/lib/personas";
+import { personaFilterSchema } from "@acme/shared";
 import { PersonaCard } from "~/components/PersonaCard";
 import { SearchBar } from "~/components/SearchBar";
 import { FilterPanel } from "~/components/FilterPanel";
 import { ErrorState } from "~/components/ErrorState";
 
-export interface SearchParams {
-  q?: string;
-  specialty?: string;
-  tier?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  sort?: string;
-}
+export type SearchParams = PersonaSearch;
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): SearchParams => {
@@ -36,14 +29,6 @@ function BrowsePage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
 
-  const queryString = new URLSearchParams();
-  if (search.q) queryString.set("q", search.q);
-  if (search.specialty) queryString.set("specialty", search.specialty);
-  if (search.tier) queryString.set("tier", search.tier);
-  if (search.minPrice) queryString.set("minPrice", String(search.minPrice));
-  if (search.maxPrice) queryString.set("maxPrice", String(search.maxPrice));
-  if (search.sort) queryString.set("sort", search.sort);
-
   const {
     data: personas = [],
     isLoading,
@@ -51,11 +36,8 @@ function BrowsePage() {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["personas"],
-    queryFn: () => {
-      const qs = queryString.toString();
-      return api.get<Persona[]>(`/personas${qs ? `?${qs}` : ""}`);
-    },
+    ...personasQueryOptions(search),
+    placeholderData: keepPreviousData,
   });
 
   const updateSearch = (updates: Partial<SearchParams>) => {

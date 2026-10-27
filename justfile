@@ -15,9 +15,10 @@ dev:
 typecheck:
     pnpm typecheck
 
-# API unit tests (Jest)
+# Unit tests: API (Jest) and web (Vitest)
 test:
     pnpm --filter @acme/api test
+    pnpm --filter @acme/web test
 
 # Browser end-to-end tests (Playwright)
 e2e:
