@@ -6,6 +6,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:e2e": "pnpm --filter @acme/e2e test",
     "clean": "turbo clean"
   },
   "devDependencies": {
