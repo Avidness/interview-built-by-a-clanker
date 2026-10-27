@@ -3,8 +3,10 @@ export {
   PersonaTier,
   personaSchema,
   personaFilterSchema,
+  addFavoriteSchema,
   type Persona,
   type PersonaFilter,
+  type AddFavoriteInput,
 } from "./schemas/persona.js";
 
 export {

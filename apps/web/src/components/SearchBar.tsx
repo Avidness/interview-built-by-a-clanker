@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -8,6 +8,13 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange }: SearchBarProps) {
   const [local, setLocal] = useState(value);
 
+  // Keep the latest onChange in a ref so a parent re-render that passes a new
+  // function does not restart the pending debounce timer.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
   useEffect(() => {
     setLocal(value);
   }, [value]);
@@ -15,15 +22,16 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (local !== value) {
-        onChange(local);
+        onChangeRef.current(local);
       }
     }, 300);
     return () => clearTimeout(timer);
-  }, [local, value, onChange]);
+  }, [local, value]);
 
   return (
     <div className="relative">
       <svg
+        aria-hidden="true"
         className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
         fill="none"
         stroke="currentColor"
@@ -45,13 +53,14 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       />
       {local && (
         <button
+          type="button"
           onClick={() => {
             setLocal("");
             onChange("");
           }}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

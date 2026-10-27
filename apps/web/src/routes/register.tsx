@@ -44,16 +44,11 @@ function RegisterPage() {
   return (
     <div className="max-w-md mx-auto mt-12">
       <div className="bg-white rounded-xl border border-gray-200 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-          Create Account
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Create Account</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
               Username
             </label>
             <input
@@ -69,10 +64,7 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
@@ -87,10 +79,7 @@ function RegisterPage() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <input
@@ -118,10 +107,7 @@ function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
+          <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Sign in
           </Link>
         </p>

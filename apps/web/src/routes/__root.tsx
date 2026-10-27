@@ -1,8 +1,7 @@
 import { createRootRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "~/lib/api";
-import type { Cart } from "@acme/shared";
+import { cartQueryOptions } from "~/lib/cart";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -12,11 +11,7 @@ function RootLayout() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const { data: cart } = useQuery({
-    queryKey: ["cart-count"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart } = useQuery(cartQueryOptions(!!user));
 
   const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 
@@ -28,9 +23,7 @@ function RootLayout() {
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-2">
                 <span className="text-2xl">🤖</span>
-                <span className="text-xl font-bold text-gray-900">
-                  Agentic Personas
-                </span>
+                <span className="text-xl font-bold text-gray-900">Agentic Personas</span>
               </Link>
               <div className="hidden sm:flex items-center gap-4">
                 <Link
@@ -53,16 +46,8 @@ function RootLayout() {
             <div className="flex items-center gap-4">
               {user ? (
                 <>
-                  <Link
-                    to="/cart"
-                    className="relative text-gray-600 hover:text-gray-900 p-2 transition-colors"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                  <Link to="/cart" className="relative text-gray-600 hover:text-gray-900 p-2 transition-colors">
+                    <svg aria-hidden="true" className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -77,10 +62,9 @@ function RootLayout() {
                     )}
                   </Link>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600">
-                      {user.username}
-                    </span>
+                    <span className="text-sm text-gray-600">{user.username}</span>
                     <button
+                      type="button"
                       onClick={() => {
                         logout();
                         router.navigate({ to: "/" });
@@ -93,10 +77,7 @@ function RootLayout() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link
-                    to="/login"
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                  >
+                  <Link to="/login" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
                     Sign in
                   </Link>
                   <Link
@@ -108,6 +89,25 @@ function RootLayout() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Below the `sm` breakpoint the inline links above are hidden, so
+              show them as a second row instead. */}
+          <div className="sm:hidden flex items-center gap-4 border-t border-gray-100 -mx-4 px-4 py-1">
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors [&.active]:text-indigo-600"
+            >
+              Browse
+            </Link>
+            {user && (
+              <Link
+                to="/favorites"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors [&.active]:text-indigo-600"
+              >
+                Favorites
+              </Link>
+            )}
           </div>
         </div>
       </nav>

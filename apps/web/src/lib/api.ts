@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3001";
+const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 class ApiError extends Error {
   constructor(
@@ -14,13 +14,12 @@ function getToken(): string | null {
   return localStorage.getItem("auth_token");
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    // Only declare a JSON payload when one is actually sent. Fastify rejects
+    // a body-less request that claims application/json with a 400.
+    ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}),
     ...((options.headers as Record<string, string>) ?? {}),
   };
 
@@ -35,10 +34,7 @@ async function request<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new ApiError(
-      response.status,
-      body.error ?? `Request failed: ${response.status}`,
-    );
+    throw new ApiError(response.status, body.error ?? `Request failed: ${response.status}`);
   }
 
   return response.json() as Promise<T>;

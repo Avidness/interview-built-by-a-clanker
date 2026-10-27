@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import type { User, AuthResponse } from "@acme/shared";
 import { api, ApiError } from "./api";
 
@@ -21,9 +14,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("auth_token"),
-  );
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("auth_token"));
   const [isLoading, setIsLoading] = useState(!!token);
 
   useEffect(() => {
@@ -53,15 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
+    localStorage.removeItem("auth_token");
     setToken(null);
     setUser(null);
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -59,24 +59,20 @@ export async function authRoutes(app: FastifyInstance) {
     }
 
     const token = app.jwt.sign({ id: user.id, email: user.email });
-    const response = {
+    const response: AuthResponse = {
       token,
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, username: user.username, email: user.email },
     };
 
     return response;
   });
 
-  app.get(
-    "/auth/me",
-    { preHandler: [authenticate] },
-    async (request, reply) => {
-      const payload = request.user as { id: string; email: string };
-      const user = db.users.getById(payload.id);
-      if (!user) {
-        return reply.status(404).send({ error: "User not found" });
-      }
-      return { id: user.id, username: user.username, email: user.email };
+  app.get("/auth/me", { preHandler: [authenticate] }, async (request, reply) => {
+    const payload = request.user as { id: string; email: string };
+    const user = db.users.getById(payload.id);
+    if (!user) {
+      return reply.status(404).send({ error: "User not found" });
     }
-  );
+    return { id: user.id, username: user.username, email: user.email };
+  });
 }
