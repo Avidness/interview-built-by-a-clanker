@@ -4,6 +4,7 @@ import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
 import { CartItem } from "~/components/CartItem";
+import { ErrorState } from "~/components/ErrorState";
 import type { Cart } from "@acme/shared";
 
 export const Route = createFileRoute("/cart")({
@@ -14,7 +15,7 @@ function CartPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: cart, isLoading } = useQuery({
+  const { data: cart, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["cart"],
     queryFn: () => api.get<Cart>("/cart"),
     enabled: !!user,
@@ -58,6 +59,16 @@ function CartPage() {
           <div key={i} className="bg-white rounded-xl border p-6 h-24" />
         ))}
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Could not load your cart"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 

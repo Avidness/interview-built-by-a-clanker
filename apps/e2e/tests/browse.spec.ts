@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import {
+  API_URL,
   PERSONAS,
   TOTAL_PERSONAS,
   money,
@@ -115,5 +116,32 @@ test.describe("Browse personas", () => {
     await expect(page.getByRole("heading", { name: "Persona not found" })).toBeVisible();
     await page.getByRole("link", { name: "Back to browse" }).click();
     await expect(page).toHaveURL("/");
+  });
+
+  test("search debounce is not reset by an unrelated re-render (GAPS 2.6)", async ({ page }) => {
+    // Hold the personas response so it can be released while the 300 ms
+    // debounce is pending. The data arriving re-renders BrowsePage; a stable
+    // onChange keeps the timer running, an unstable one restarts it.
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    await page.route(`${API_URL}/personas`, async (route) => {
+      await gate;
+      await route.continue();
+    });
+
+    await page.goto("/");
+    const input = page.getByPlaceholder(/Search personas/);
+    await expect(input).toBeVisible();
+
+    const started = Date.now();
+    await input.fill("rex");
+    await page.waitForTimeout(200);
+    release();
+
+    await page.waitForURL(/q=rex/);
+    const elapsed = Date.now() - started;
+    // ~300 ms when the debounce is stable; >= 500 ms if the re-render at
+    // 200 ms restarted it.
+    expect(elapsed, `URL updated after ${elapsed} ms`).toBeLessThan(450);
   });
 });

@@ -109,6 +109,25 @@ function RootLayout() {
               )}
             </div>
           </div>
+
+          {/* Below the `sm` breakpoint the inline links above are hidden, so
+              show them as a second row instead. */}
+          <div className="sm:hidden flex items-center gap-4 border-t border-gray-100 -mx-4 px-4 py-1">
+            <Link
+              to="/"
+              className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors [&.active]:text-indigo-600"
+            >
+              Browse
+            </Link>
+            {user && (
+              <Link
+                to="/favorites"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors [&.active]:text-indigo-600"
+              >
+                Favorites
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
 

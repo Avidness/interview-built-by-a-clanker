@@ -4,6 +4,7 @@ import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
 import { PersonaCard } from "~/components/PersonaCard";
+import { ErrorState } from "~/components/ErrorState";
 import type { Persona } from "@acme/shared";
 
 export const Route = createFileRoute("/favorites")({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/favorites")({
 function FavoritesPage() {
   const { user } = useAuth();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["favorites"],
     queryFn: () => api.get<{ favorites: Persona[] }>("/favorites"),
     enabled: !!user,
@@ -53,6 +54,16 @@ function FavoritesPage() {
           />
         ))}
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <ErrorState
+        title="Could not load your favorites"
+        error={error}
+        onRetry={() => refetch()}
+      />
     );
   }
 

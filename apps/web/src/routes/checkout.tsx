@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
@@ -13,9 +13,17 @@ export const Route = createFileRoute("/checkout")({
 function CheckoutPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(user?.username ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
   const [order, setOrder] = useState<Order | null>(null);
+
+  // The user may resolve (via /auth/me) after this page mounts: prefill any
+  // field the visitor has not already typed into.
+  useEffect(() => {
+    if (!user) return;
+    setName((current) => current || user.username);
+    setEmail((current) => current || user.email);
+  }, [user]);
 
   const { data: cart, isLoading } = useQuery({
     queryKey: ["cart"],
