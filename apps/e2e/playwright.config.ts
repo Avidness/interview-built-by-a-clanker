@@ -14,9 +14,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI
-    ? [["list"], ["html", { open: "never" }]]
-    : [["html", { open: "never" }]],
+  reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : [["html", { open: "never" }]],
   timeout: 30_000,
   expect: { timeout: 5_000 },
   use: {
@@ -33,8 +31,7 @@ export default defineConfig({
   webServer: [
     {
       // Both apps import @acme/shared from its dist, so build it first.
-      command:
-        "pnpm --filter @acme/shared build && pnpm --filter @acme/api exec tsx src/index.ts",
+      command: "pnpm --filter @acme/shared build && pnpm --filter @acme/api exec tsx src/index.ts",
       url: `${API_URL}/health`,
       reuseExistingServer: false,
       timeout: 120_000,

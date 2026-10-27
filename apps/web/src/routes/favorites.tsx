@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
+import { FAVORITES_QUERY_KEY, favoritesQueryOptions } from "~/lib/favorites";
 import { AuthGate } from "~/components/AuthGate";
 import { queryClient } from "~/lib/queryClient";
 import { PersonaCard } from "~/components/PersonaCard";
+import { ErrorState } from "~/components/ErrorState";
 import type { Persona } from "@acme/shared";
 
 export const Route = createFileRoute("/favorites")({
@@ -22,31 +24,28 @@ function FavoritesSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-white rounded-xl border p-6 animate-pulse h-48"
-        />
+        <div key={i} className="bg-white rounded-xl border p-6 animate-pulse h-48" />
       ))}
     </div>
   );
 }
 
 function FavoritesContents() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["favorites"],
-    queryFn: () => api.get<{ favorites: Persona[] }>("/favorites"),
-  });
+  const { data, isLoading, isError, error, refetch } = useQuery(favoritesQueryOptions(true));
 
   const removeFavorite = useMutation({
-    mutationFn: (personaId: string) =>
-      api.delete(`/favorites/${personaId}`),
+    mutationFn: (personaId: string) => api.delete(`/favorites/${personaId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+      queryClient.invalidateQueries({ queryKey: FAVORITES_QUERY_KEY });
     },
   });
 
   if (isLoading) {
     return <FavoritesSkeleton />;
+  }
+
+  if (isError) {
+    return <ErrorState title="Could not load your favorites" error={error} onRetry={() => refetch()} />;
   }
 
   const favorites = data?.favorites ?? [];
@@ -57,13 +56,8 @@ function FavoritesContents() {
 
       {favorites.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 text-lg mb-4">
-            You haven't favorited any personas yet.
-          </p>
-          <Link
-            to="/"
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
-          >
+          <p className="text-gray-500 text-lg mb-4">You haven't favorited any personas yet.</p>
+          <Link to="/" className="text-indigo-600 hover:text-indigo-700 font-medium">
             Browse personas
           </Link>
         </div>
@@ -71,13 +65,15 @@ function FavoritesContents() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {favorites.map((persona) => (
             <div key={persona.id} className="relative">
-              <PersonaCard persona={persona} />
+              <PersonaCard persona={persona} isFavorited />
               <button
+                type="button"
                 onClick={() => removeFavorite.mutate(persona.id)}
                 className="absolute top-4 right-4 p-2 bg-white rounded-full shadow hover:bg-gray-50 transition-colors"
                 title="Remove from favorites"
               >
                 <svg
+                  aria-hidden="true"
                   className="w-5 h-5 text-red-500 fill-red-500"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

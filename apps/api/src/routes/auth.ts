@@ -67,16 +67,12 @@ export async function authRoutes(app: FastifyInstance) {
     return response;
   });
 
-  app.get(
-    "/auth/me",
-    { preHandler: [authenticate] },
-    async (request, reply) => {
-      const payload = request.user as { id: string; email: string };
-      const user = db.users.getById(payload.id);
-      if (!user) {
-        return reply.status(404).send({ error: "User not found" });
-      }
-      return { id: user.id, username: user.username, email: user.email };
+  app.get("/auth/me", { preHandler: [authenticate] }, async (request, reply) => {
+    const payload = request.user as { id: string; email: string };
+    const user = db.users.getById(payload.id);
+    if (!user) {
+      return reply.status(404).send({ error: "User not found" });
     }
-  );
+    return { id: user.id, username: user.username, email: user.email };
+  });
 }

@@ -25,7 +25,10 @@ vi.mock("~/lib/api", () => ({
 }));
 
 function cartWith(quantity: number): Cart {
-  return { items: [{ id: "cart-1", personaId: "p-001", quantity, persona: {} as Cart["items"][0]["persona"] }], total: 0 };
+  return {
+    items: [{ id: "cart-1", personaId: "p-001", quantity, persona: {} as Cart["items"][0]["persona"] }],
+    total: 0,
+  };
 }
 
 let queryClient: QueryClient;

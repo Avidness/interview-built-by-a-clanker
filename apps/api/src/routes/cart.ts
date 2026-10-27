@@ -30,36 +30,30 @@ export async function cartRoutes(app: FastifyInstance) {
     return buildCart(userId);
   });
 
-  app.put<{ Params: { itemId: string } }>(
-    "/cart/:itemId",
-    async (request, reply) => {
-      const { id: userId } = request.user as { id: string };
-      const parsed = updateCartItemSchema.safeParse(request.body);
-      if (!parsed.success) {
-        return reply.status(400).send({ error: parsed.error.flatten() });
-      }
-
-      const item = db.cart.getById(request.params.itemId);
-      if (!item || item.userId !== userId) {
-        return reply.status(404).send({ error: "Cart item not found" });
-      }
-
-      db.cart.update(request.params.itemId, parsed.data.quantity);
-      return buildCart(userId);
+  app.put<{ Params: { itemId: string } }>("/cart/:itemId", async (request, reply) => {
+    const { id: userId } = request.user as { id: string };
+    const parsed = updateCartItemSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.status(400).send({ error: parsed.error.flatten() });
     }
-  );
 
-  app.delete<{ Params: { itemId: string } }>(
-    "/cart/:itemId",
-    async (request, reply) => {
-      const { id: userId } = request.user as { id: string };
-      const item = db.cart.getById(request.params.itemId);
-      if (!item || item.userId !== userId) {
-        return reply.status(404).send({ error: "Cart item not found" });
-      }
-
-      db.cart.remove(request.params.itemId);
-      return buildCart(userId);
+    const item = db.cart.getById(request.params.itemId);
+    if (!item || item.userId !== userId) {
+      return reply.status(404).send({ error: "Cart item not found" });
     }
-  );
+
+    db.cart.update(request.params.itemId, parsed.data.quantity);
+    return buildCart(userId);
+  });
+
+  app.delete<{ Params: { itemId: string } }>("/cart/:itemId", async (request, reply) => {
+    const { id: userId } = request.user as { id: string };
+    const item = db.cart.getById(request.params.itemId);
+    if (!item || item.userId !== userId) {
+      return reply.status(404).send({ error: "Cart item not found" });
+    }
+
+    db.cart.remove(request.params.itemId);
+    return buildCart(userId);
+  });
 }

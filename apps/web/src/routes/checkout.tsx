@@ -1,8 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/lib/api";
 import { AuthGate } from "~/components/AuthGate";
+import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
 import { cartQueryOptions, invalidateCart } from "~/lib/cart";
 import type { Order } from "@acme/shared";
@@ -24,10 +25,18 @@ function CheckoutSkeleton() {
 }
 
 function CheckoutContents() {
-  const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { user } = useAuth();
+  const [name, setName] = useState(user?.username ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
   const [order, setOrder] = useState<Order | null>(null);
+
+  // The user may resolve (via /auth/me) after this page mounts: prefill any
+  // field the visitor has not already typed into.
+  useEffect(() => {
+    if (!user) return;
+    setName((current) => current || user.username);
+    setEmail((current) => current || user.email);
+  }, [user]);
 
   const { data: cart, isLoading } = useQuery(cartQueryOptions(true));
 
@@ -43,9 +52,7 @@ function CheckoutContents() {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
         <div className="text-5xl mb-4">🎉</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Order Confirmed!
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h2>
         <p className="text-gray-600 mb-2">
           Order ID: <span className="font-mono">{order.id}</span>
         </p>
@@ -53,8 +60,8 @@ function CheckoutContents() {
           Total: <span className="font-bold">${order.total.toFixed(2)}</span>
         </p>
         <p className="text-gray-500 mb-8">
-          Your agentic personas are being deployed to your workspace. You'll
-          receive a confirmation email at {order.customerEmail}.
+          Your agentic personas are being deployed to your workspace. You'll receive a confirmation email at{" "}
+          {order.customerEmail}.
         </p>
         <Link
           to="/"
@@ -62,6 +69,11 @@ function CheckoutContents() {
         >
           Continue Shopping
         </Link>
+        <p className="mt-6">
+          <Link to="/orders" className="text-indigo-600 hover:text-indigo-700 font-medium">
+            View your orders
+          </Link>
+        </p>
       </div>
     );
   }
@@ -73,13 +85,8 @@ function CheckoutContents() {
   if (!cart || cart.items.length === 0) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Nothing to checkout
-        </h2>
-        <Link
-          to="/"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Nothing to checkout</h2>
+        <Link to="/" className="text-indigo-600 hover:text-indigo-700 font-medium">
           Browse personas
         </Link>
       </div>
@@ -91,19 +98,14 @@ function CheckoutContents() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Order Summary
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
         <div className="space-y-3 mb-4">
           {cart.items.map((item) => (
             <div key={item.id} className="flex justify-between">
               <span className="text-gray-700">
-                {item.persona.name}{" "}
-                <span className="text-gray-400">x{item.quantity}</span>
+                {item.persona.name} <span className="text-gray-400">x{item.quantity}</span>
               </span>
-              <span className="font-medium">
-                ${(item.persona.price * item.quantity).toFixed(2)}
-              </span>
+              <span className="font-medium">${(item.persona.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -120,15 +122,10 @@ function CheckoutContents() {
         }}
         className="bg-white rounded-xl border border-gray-200 p-6"
       >
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Contact Information
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
         <div className="space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Full Name
             </label>
             <input
@@ -142,10 +139,7 @@ function CheckoutContents() {
             />
           </div>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <input
@@ -160,11 +154,7 @@ function CheckoutContents() {
           </div>
         </div>
 
-        {checkout.error && (
-          <p className="mt-4 text-red-600 text-sm">
-            {checkout.error.message}
-          </p>
-        )}
+        {checkout.error && <p className="mt-4 text-red-600 text-sm">{checkout.error.message}</p>}
 
         <button
           type="submit"

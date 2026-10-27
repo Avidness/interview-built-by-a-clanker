@@ -20,6 +20,10 @@ pnpm dev
 - Frontend: http://localhost:5173
 - API: http://localhost:3001
 
+`pnpm dev` builds `@acme/shared` first (both apps import it from `dist/`), so a separate `pnpm build` is not required before starting.
+
+> **All state is in memory.** Users, carts, favorites and orders live in the API process and reset every time it restarts, including the automatic restarts `tsx watch` performs on each save under `pnpm dev`.
+
 ## Your Task
 
 There are bugs scattered throughout the frontend, backend, and shared packages. Some will be immediately obvious (build failures, runtime crashes), while others are more subtle (incorrect behavior, broken features).

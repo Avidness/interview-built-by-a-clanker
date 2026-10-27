@@ -26,10 +26,7 @@ export function AuthGate({ title, fallback, children }: AuthGateProps) {
     return (
       <div className="text-center py-16">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-        <Link
-          to="/login"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
+        <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
           Go to sign in
         </Link>
       </div>

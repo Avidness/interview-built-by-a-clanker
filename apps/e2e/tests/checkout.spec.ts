@@ -61,10 +61,27 @@ test.describe("Checkout", () => {
     await addToCartViaApi(request, token, PERSONAS.rex.id, 1);
 
     await page.goto("/checkout");
+    // Fields are prefilled from the signed-in user (GAPS 1.5); empty them.
+    await expect(page.getByLabel("Full Name")).not.toHaveValue("");
+    await page.getByLabel("Full Name").fill("");
+    await page.getByLabel("Email").fill("");
     await page.getByRole("button", { name: "Place Order" }).click();
 
     await expect(page.getByRole("heading", { name: "Checkout" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Order Confirmed!" })).toHaveCount(0);
     await expect(page.getByLabel("Full Name")).toBeFocused();
+  });
+
+  test("prefills name and email from the signed-in user (GAPS 1.5)", async ({ page, request }) => {
+    const { token, creds } = await loginAs(page, request);
+    await addToCartViaApi(request, token, PERSONAS.rex.id, 1);
+
+    await page.goto("/checkout");
+    await expect(page.getByLabel("Full Name")).toHaveValue(creds.username);
+    await expect(page.getByLabel("Email")).toHaveValue(creds.email);
+
+    // Still editable.
+    await page.getByLabel("Full Name").fill("Jane Doe");
+    await expect(page.getByLabel("Full Name")).toHaveValue("Jane Doe");
   });
 });

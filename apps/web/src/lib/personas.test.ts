@@ -17,9 +17,7 @@ describe("personasQueryOptions", () => {
   });
 
   it("uses the same query key for the same filters, so the cache is reused", () => {
-    expect(personasQueryOptions({ q: "rex" }).queryKey).toEqual(
-      personasQueryOptions({ q: "rex" }).queryKey,
-    );
+    expect(personasQueryOptions({ q: "rex" }).queryKey).toEqual(personasQueryOptions({ q: "rex" }).queryKey);
   });
 
   it("requests /personas with the active filters as a query string", async () => {

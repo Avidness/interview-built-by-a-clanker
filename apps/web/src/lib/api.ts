@@ -14,10 +14,7 @@ function getToken(): string | null {
   return localStorage.getItem("auth_token");
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
     // Only declare a JSON payload when one is actually sent. Fastify rejects
@@ -37,10 +34,7 @@ async function request<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new ApiError(
-      response.status,
-      body.error ?? `Request failed: ${response.status}`,
-    );
+    throw new ApiError(response.status, body.error ?? `Request failed: ${response.status}`);
   }
 
   return response.json() as Promise<T>;

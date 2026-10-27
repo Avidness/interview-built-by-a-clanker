@@ -1,21 +1,27 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { personasQueryOptions, type PersonaSearch } from "~/lib/personas";
+import { personaFilterSchema } from "@acme/shared";
 import { PersonaCard } from "~/components/PersonaCard";
 import { SearchBar } from "~/components/SearchBar";
 import { FilterPanel } from "~/components/FilterPanel";
+import { ErrorState } from "~/components/ErrorState";
 
 export type SearchParams = PersonaSearch;
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): SearchParams => ({
-    q: (search.q as string) || undefined,
-    specialty: (search.specialty as string) || undefined,
-    tier: (search.tier as string) || undefined,
-    minPrice: search.minPrice ? Number(search.minPrice) : undefined,
-    maxPrice: search.maxPrice ? Number(search.maxPrice) : undefined,
-    sort: (search.sort as string) || undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): SearchParams => {
+    // Validate each field independently so one bad param (e.g. tier=Platinum
+    // or minPrice=abc) is dropped without discarding the rest of the search.
+    const result: SearchParams = {};
+    for (const key of Object.keys(personaFilterSchema.shape) as (keyof SearchParams)[]) {
+      const parsed = personaFilterSchema.shape[key].safeParse(search[key]);
+      if (parsed.success && parsed.data !== undefined && parsed.data !== "") {
+        (result as Record<string, unknown>)[key] = parsed.data;
+      }
+    }
+    return result;
+  },
   component: BrowsePage,
 });
 
@@ -23,7 +29,13 @@ function BrowsePage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
 
-  const { data: personas = [], isLoading } = useQuery({
+  const {
+    data: personas = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     ...personasQueryOptions(search),
     placeholderData: keepPreviousData,
   });
@@ -46,27 +58,25 @@ function BrowsePage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Discover Agentic Personas
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover Agentic Personas</h1>
         <p className="text-gray-600">
-          Find the perfect AI agent for your team. Browse our curated collection
-          of specialized personas.
+          Find the perfect AI agent for your team. Browse our curated collection of specialized personas.
         </p>
       </div>
 
-      <SearchBar
-        value={search.q ?? ""}
-        onChange={(q) => updateSearch({ q: q || undefined })}
-      />
+      <SearchBar value={search.q ?? ""} onChange={(q) => updateSearch({ q: q || undefined })} />
 
       <div className="mt-6 flex flex-col lg:flex-row gap-8">
         <FilterPanel
           specialty={search.specialty}
           tier={search.tier}
+          minPrice={search.minPrice}
+          maxPrice={search.maxPrice}
           sort={search.sort}
           onSpecialtyChange={(specialty) => updateSearch({ specialty })}
           onTierChange={(tier) => updateSearch({ tier })}
+          onMinPriceChange={(minPrice) => updateSearch({ minPrice })}
+          onMaxPriceChange={(maxPrice) => updateSearch({ maxPrice })}
           onSortChange={(sort) => updateSearch({ sort })}
         />
 
@@ -74,10 +84,7 @@ function BrowsePage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse"
-                >
+                <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
                   <div className="w-16 h-16 bg-gray-200 rounded-full mb-4" />
                   <div className="h-5 bg-gray-200 rounded w-3/4 mb-2" />
                   <div className="h-4 bg-gray-200 rounded w-full mb-4" />
@@ -85,12 +92,13 @@ function BrowsePage() {
                 </div>
               ))}
             </div>
+          ) : isError ? (
+            <ErrorState title="Could not load personas" error={error} onRetry={() => refetch()} />
           ) : personas.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">
-                No personas found matching your criteria.
-              </p>
+              <p className="text-gray-500 text-lg">No personas found matching your criteria.</p>
               <button
+                type="button"
                 onClick={() => navigate({ to: "/", search: {} })}
                 className="mt-4 text-indigo-600 hover:text-indigo-700 font-medium"
               >

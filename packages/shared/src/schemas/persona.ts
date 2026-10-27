@@ -21,14 +21,7 @@ export const personaSchema = z.object({
   tagline: z.string(),
   description: z.string(),
   avatarUrl: z.string(),
-  specialty: z.enum([
-    "Engineering",
-    "Design",
-    "Data",
-    "Security",
-    "DevOps",
-    "Product",
-  ]),
+  specialty: z.enum(["Engineering", "Design", "Data", "Security", "DevOps", "Product"]),
   capabilities: z.array(z.string()),
   price: z.number(),
   rating: z.number().min(1).max(5),
@@ -40,15 +33,17 @@ export type Persona = z.infer<typeof personaSchema>;
 
 export const personaFilterSchema = z.object({
   q: z.string().optional(),
-  specialty: z
-    .enum(["Engineering", "Design", "Data", "Security", "DevOps", "Product"])
-    .optional(),
+  specialty: z.enum(["Engineering", "Design", "Data", "Security", "DevOps", "Product"]).optional(),
   tier: z.enum(["Starter", "Pro", "Enterprise"]).optional(),
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
-  sort: z
-    .enum(["price-asc", "price-desc", "rating-desc", "name-asc"])
-    .optional(),
+  sort: z.enum(["price-asc", "price-desc", "rating-desc", "name-asc"]).optional(),
 });
 
 export type PersonaFilter = z.infer<typeof personaFilterSchema>;
+
+export const addFavoriteSchema = z.object({
+  personaId: z.string().min(1),
+});
+
+export type AddFavoriteInput = z.infer<typeof addFavoriteSchema>;
