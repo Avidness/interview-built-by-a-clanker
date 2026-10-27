@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
-import { useAuth } from "~/lib/auth";
+import { AuthGate } from "~/components/AuthGate";
 import { queryClient } from "~/lib/queryClient";
+import { cartQueryOptions, invalidateCart } from "~/lib/cart";
 import { CartItem } from "~/components/CartItem";
 import type { Cart } from "@acme/shared";
 
@@ -11,54 +12,45 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { user } = useAuth();
+  return (
+    <AuthGate title="Sign in to view your cart" fallback={<CartSkeleton />}>
+      <CartContents />
+    </AuthGate>
+  );
+}
+
+function CartSkeleton() {
+  return (
+    <div className="animate-pulse space-y-4">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="bg-white rounded-xl border p-6 h-24" />
+      ))}
+    </div>
+  );
+}
+
+function CartContents() {
   const navigate = useNavigate();
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart, isLoading } = useQuery(cartQueryOptions(true));
 
   const updateQuantity = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
       api.put<Cart>(`/cart/${itemId}`, { quantity }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 
   const removeItem = useMutation({
     mutationFn: (itemId: string) => api.delete<Cart>(`/cart/${itemId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 
-  if (!user) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Sign in to view your cart
-        </h2>
-        <Link
-          to="/login"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
-          Go to sign in
-        </Link>
-      </div>
-    );
-  }
-
   if (isLoading) {
-    return (
-      <div className="animate-pulse space-y-4">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-white rounded-xl border p-6 h-24" />
-        ))}
-      </div>
-    );
+    return <CartSkeleton />;
   }
 
   if (!cart || cart.items.length === 0) {

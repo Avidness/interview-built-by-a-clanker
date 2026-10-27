@@ -2,50 +2,42 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "~/lib/api";
-import { useAuth } from "~/lib/auth";
+import { AuthGate } from "~/components/AuthGate";
 import { queryClient } from "~/lib/queryClient";
-import type { Cart, Order } from "@acme/shared";
+import { cartQueryOptions, invalidateCart } from "~/lib/cart";
+import type { Order } from "@acme/shared";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
 function CheckoutPage() {
-  const { user } = useAuth();
+  return (
+    <AuthGate title="Sign in to checkout" fallback={<CheckoutSkeleton />}>
+      <CheckoutContents />
+    </AuthGate>
+  );
+}
+
+function CheckoutSkeleton() {
+  return <div className="animate-pulse h-96 bg-gray-100 rounded-xl" />;
+}
+
+function CheckoutContents() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart, isLoading } = useQuery(cartQueryOptions(true));
 
   const checkout = useMutation({
     mutationFn: () => api.post<Order>("/checkout", { name, email }),
     onSuccess: (data) => {
       setOrder(data);
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
-
-  if (!user) {
-    return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Sign in to checkout
-        </h2>
-        <Link
-          to="/login"
-          className="text-indigo-600 hover:text-indigo-700 font-medium"
-        >
-          Go to sign in
-        </Link>
-      </div>
-    );
-  }
 
   if (order) {
     return (
@@ -75,7 +67,7 @@ function CheckoutPage() {
   }
 
   if (isLoading) {
-    return <div className="animate-pulse h-96 bg-gray-100 rounded-xl" />;
+    return <CheckoutSkeleton />;
   }
 
   if (!cart || cart.items.length === 0) {
