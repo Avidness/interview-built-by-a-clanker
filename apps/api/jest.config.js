@@ -10,6 +10,5 @@ export default {
     "^(\\.{1,2}/.*)\\.js$": "$1",
     "^@acme/shared$": "<rootDir>/../../packages/shared/src/index.ts",
   },
-  setupFiles: ["<rootDir>/test/setup-env.ts"],
   clearMocks: true,
 };

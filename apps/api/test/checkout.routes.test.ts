@@ -50,6 +50,9 @@ describe("POST /checkout", () => {
 
     const after = (await app.inject(authed(user, { method: "GET", url: "/cart" }))).json<Cart>();
     expect(after).toEqual({ items: [], total: 0 });
+
+    const again = await app.inject(authed(user, { method: "POST", url: "/checkout", payload: customer }));
+    expect(again.statusCode).toBe(400);
   });
 
   it("gives each order a unique id", async () => {

@@ -22,6 +22,7 @@ Current baseline on the uncommitted working tree:
 ### A1. Web typecheck fails: `SearchParams` not exported
 - **File:** `apps/web/src/routes/index.tsx:9`
 - **Status:** Confirmed (build)
+- **Fixed:** branch `fix/bugs-a-c`, commit `f676cb3`
 - `interface SearchParams` is used in `validateSearch`'s return type but is not exported. The generated `routeTree.gen.ts` re-exports `IndexRoute`, so TypeScript emits `TS4023: Exported variable 'IndexRoute' has or is using name 'SearchParams' ... but cannot be named`.
 - **Fix:** `export interface SearchParams`.
 
@@ -32,6 +33,7 @@ Current baseline on the uncommitted working tree:
 ### B1. Auth is disabled by default and protected routes crash with 500
 - **File:** `apps/api/src/middleware/auth.ts:3-12`
 - **Status:** Confirmed (read)
+- **Fixed:** branch `fix/bugs-a-c`, commit `48639aa`
 - `ENFORCE_AUTH` defaults to `false`, so `authenticate` returns before calling `request.jwtVerify()`. Every protected handler then does `const { id: userId } = request.user as { id: string }` on an unset `request.user` and throws a TypeError → HTTP 500 for `/cart`, `/favorites`, `/checkout`, `/auth/me`.
 - The README's `pnpm dev` does not set the env var, so the app as shipped has no working cart, favorites, or checkout. The new Jest `setup-env.ts` and the Playwright config both force `ENFORCE_AUTH=true`, which masks this in tests.
 - **Fix:** always verify the JWT (drop the flag, or invert it to an explicit opt-out for local debugging).
@@ -39,39 +41,45 @@ Current baseline on the uncommitted working tree:
 ### B2. `minPrice` filter is an upper bound
 - **File:** `apps/api/src/db.ts` (`db.personas.search`, the `minPrice` branch)
 - **Status:** Confirmed (test) — `db.test.ts` ×2, `personas.routes.test.ts` ×1
+- **Fixed:** branch `fix/bugs-a-c`, commit `4a34145`
 - Uses `p.price <= filters.minPrice`; should be `>=`.
 
 ### B3. CORS does not allow `DELETE`
 - **File:** `apps/api/src/app.ts:21` (was `index.ts` at HEAD)
 - **Status:** Confirmed (test) — `cart.routes.test.ts › allows the browser to preflight DELETE`; e2e `cart › removes an item from the cart`, `favorites › removes a favorite from the favorites page`
+- **Fixed:** branch `fix/bugs-a-c`, commit `f63d0bb`
 - `methods: ["GET", "POST", "PUT", "OPTIONS"]`. The browser preflight for removing a cart item or a favorite fails, so those UI actions never reach the server.
 - **Fix:** add `"DELETE"` (or drop the `methods` override and use the default).
 
 ### B4. Login response omits `username`
 - **File:** `apps/api/src/routes/auth.ts:60-64`
 - **Status:** Confirmed (test) — `auth.routes.test.ts › returns a token and the same public user shape as register`
+- **Fixed:** branch `fix/bugs-a-c`, commit `e32ede4`
 - Register returns `{ id, username, email }`; login returns `{ id, email }`. The `response` object is not annotated as `AuthResponse`, so TypeScript does not catch it. The nav bar renders `user.username` → blank after login until a reload re-fetches `/auth/me`.
 - **Fix:** include `username`, and type the local as `AuthResponse`.
 
 ### B5. Checkout never clears the cart
 - **File:** `apps/api/src/routes/checkout.ts`
 - **Status:** Confirmed (test) — `checkout.routes.test.ts › creates an order ... then empties the cart`; e2e `checkout › empties the cart after a successful order`
+- **Fixed:** branch `fix/bugs-a-c`, commit `f50bafa`
 - `db.cart.clearForUser(userId)` exists in `db.ts` but is never called. After placing an order the cart still holds the items, so a second checkout double-charges.
 - Also bypasses `db.cart.getByUserId` and re-implements `enrichCartItems` from `cart.ts`; worth deduplicating when fixing.
 
 ### B6. `DELETE /cart/:itemId` has no ownership check (IDOR)
 - **File:** `apps/api/src/routes/cart.ts` (delete handler)
 - **Status:** Confirmed (test) — `cart.routes.test.ts › keeps carts isolated between users`
+- **Fixed:** branch `fix/bugs-a-c`, commit `3b366e9`
 - `PUT /cart/:itemId` checks `item.userId !== userId`; `DELETE` only checks existence. Any authenticated user can delete any other user's cart line by guessing `cart-N` ids (which are sequential).
 
 ---
 
 ## C. Shared (`packages/shared`)
 
-No defects found in the schemas themselves. Two gaps worth noting:
+No defects found in the schemas themselves. Two gaps, both now closed:
 
-- `personaFilterSchema` (with `z.coerce.number()` and enum validation) is exported but **unused**; `routes/personas.ts` hand-parses the query string and accepts any string for `specialty` / `tier` / `sort`.
-- `AuthResponse` is defined but not applied on the login route (see B4), which is how the shape drift slipped through.
+- `personaFilterSchema` was exported but **unused**; `routes/personas.ts` hand-parsed the query string and accepted any string for `specialty` / `tier` / `sort`, and `minPrice=abc` became `NaN`.
+  **Fixed:** branch `fix/bugs-a-c`, commit `2c47f01` — the route now `safeParse`s the query with the shared schema and returns 400 like every other route. New cases in `personas.routes.test.ts`.
+- `AuthResponse` was not applied on the login route (see B4), which is how the shape drift slipped through. Fixed with B4.
 
 ---
 
@@ -127,6 +135,15 @@ No defects found in the schemas themselves. Two gaps worth noting:
 
 ---
 
+### D10. Web fetch wrapper sends `Content-Type: application/json` on body-less requests, so every DELETE gets 400
+- **File:** `apps/web/src/lib/api.ts` (`request()`, the `headers` object)
+- **Status:** Confirmed (test) — found 2026-10-27 while verifying B3 on `fix/bugs-a-c`: Playwright trace shows `DELETE /cart/cart-1 -> 400` after the CORS fix. e2e `cart › removes an item from the cart` and `favorites › removes a favorite from the favorites page` stay red until this is fixed.
+- The wrapper always sets `Content-Type: application/json`. `api.delete()` sends no body, and Fastify's JSON parser rejects an empty body with that content type (`FST_ERR_CTP_EMPTY_JSON_BODY`, HTTP 400). B3 (CORS) was masking this: the preflight failed before the request was ever sent.
+- **Fix:** only set `Content-Type` when `options.body` is present. (Server-side alternative: a custom `application/json` parser that treats an empty body as `undefined`, but the client is the one at fault.)
+- Not in section B because the API behaves correctly; it is the client that lies about its payload.
+
+---
+
 ## E. Test baseline on branch `test/api-unit-and-e2e`
 
 Committed 2026-10-27 on `test/api-unit-and-e2e` (pushed to origin). Nothing in this change set fixes a bug; it only adds the harness that proves them.
@@ -152,10 +169,8 @@ Expected after fixes: both suites green, and `just check` passes.
 
 ## F. Suggested fix order
 
-1. A1 (unblocks `just check`).
-2. B1 (nothing authed works without it in dev).
-3. B2, B3, B4, B5, B6 (each has a failing test; small one-line fixes except B5).
-4. D1, D2, D3, D4, D5, D6 (user-visible, covered by e2e).
+1. ~~A1~~, ~~B1~~, ~~B2–B6~~, ~~C~~ — done on `fix/bugs-a-c` (API suite 56/56, `just check` green).
+4. D1, D2, D3, D4, D5, D6, D10 (user-visible, covered by e2e). D10 blocks two e2e tests that look like B3/B5 failures.
 5. D7, D8, D9 (polish).
 
 See `GAPS.md` in this folder for functionality that is intended by the schemas/UI but not implemented.
