@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
+import { cartQueryOptions, invalidateCart } from "~/lib/cart";
 import { CartItem } from "~/components/CartItem";
 import type { Cart } from "@acme/shared";
 
@@ -14,24 +15,20 @@ function CartPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart, isLoading } = useQuery(cartQueryOptions(!!user));
 
   const updateQuantity = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
       api.put<Cart>(`/cart/${itemId}`, { quantity }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 
   const removeItem = useMutation({
     mutationFn: (itemId: string) => api.delete<Cart>(`/cart/${itemId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 

@@ -1,8 +1,7 @@
 import { createRootRoute, Link, Outlet, useRouter } from "@tanstack/react-router";
 import { useAuth } from "~/lib/auth";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "~/lib/api";
-import type { Cart } from "@acme/shared";
+import { cartQueryOptions } from "~/lib/cart";
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -12,11 +11,7 @@ function RootLayout() {
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const { data: cart } = useQuery({
-    queryKey: ["cart-count"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart } = useQuery(cartQueryOptions(!!user));
 
   const cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
 

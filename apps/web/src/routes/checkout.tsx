@@ -4,7 +4,8 @@ import { useState } from "react";
 import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
-import type { Cart, Order } from "@acme/shared";
+import { cartQueryOptions, invalidateCart } from "~/lib/cart";
+import type { Order } from "@acme/shared";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
@@ -17,17 +18,13 @@ function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
 
-  const { data: cart, isLoading } = useQuery({
-    queryKey: ["cart"],
-    queryFn: () => api.get<Cart>("/cart"),
-    enabled: !!user,
-  });
+  const { data: cart, isLoading } = useQuery(cartQueryOptions(!!user));
 
   const checkout = useMutation({
     mutationFn: () => api.post<Order>("/checkout", { name, email }),
     onSuccess: (data) => {
       setOrder(data);
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 

@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { api } from "~/lib/api";
 import { useAuth } from "~/lib/auth";
 import { queryClient } from "~/lib/queryClient";
+import { invalidateCart } from "~/lib/cart";
 import {
   FAVORITES_QUERY_KEY,
   favoriteIdsQueryOptions,
@@ -32,7 +33,7 @@ function PersonaDetailPage() {
     mutationFn: () =>
       api.post<Cart>("/cart", { personaId, quantity: 1 }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      invalidateCart(queryClient);
     },
   });
 
