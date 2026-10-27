@@ -76,9 +76,13 @@ function BrowsePage() {
         <FilterPanel
           specialty={search.specialty}
           tier={search.tier}
+          minPrice={search.minPrice}
+          maxPrice={search.maxPrice}
           sort={search.sort}
           onSpecialtyChange={(specialty) => updateSearch({ specialty })}
           onTierChange={(tier) => updateSearch({ tier })}
+          onMinPriceChange={(minPrice) => updateSearch({ minPrice })}
+          onMaxPriceChange={(maxPrice) => updateSearch({ maxPrice })}
           onSortChange={(sort) => updateSearch({ sort })}
         />
 

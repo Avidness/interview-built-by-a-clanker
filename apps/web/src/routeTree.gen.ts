@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as RegisterRouteImport } from "./routes/register"
+import { Route as OrdersRouteImport } from "./routes/orders"
 import { Route as LoginRouteImport } from "./routes/login"
 import { Route as FavoritesRouteImport } from "./routes/favorites"
 import { Route as CheckoutRouteImport } from "./routes/checkout"
@@ -20,6 +21,11 @@ import { Route as PersonasPersonaIdRouteImport } from "./routes/personas/$person
 const RegisterRoute = RegisterRouteImport.update({
   id: "/register",
   path: "/register",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: "/orders",
+  path: "/orders",
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   "/checkout": typeof CheckoutRoute
   "/favorites": typeof FavoritesRoute
   "/login": typeof LoginRoute
+  "/orders": typeof OrdersRoute
   "/register": typeof RegisterRoute
   "/personas/$personaId": typeof PersonasPersonaIdRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   "/checkout": typeof CheckoutRoute
   "/favorites": typeof FavoritesRoute
   "/login": typeof LoginRoute
+  "/orders": typeof OrdersRoute
   "/register": typeof RegisterRoute
   "/personas/$personaId": typeof PersonasPersonaIdRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   "/checkout": typeof CheckoutRoute
   "/favorites": typeof FavoritesRoute
   "/login": typeof LoginRoute
+  "/orders": typeof OrdersRoute
   "/register": typeof RegisterRoute
   "/personas/$personaId": typeof PersonasPersonaIdRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | "/checkout"
     | "/favorites"
     | "/login"
+    | "/orders"
     | "/register"
     | "/personas/$personaId"
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | "/checkout"
     | "/favorites"
     | "/login"
+    | "/orders"
     | "/register"
     | "/personas/$personaId"
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | "/checkout"
     | "/favorites"
     | "/login"
+    | "/orders"
     | "/register"
     | "/personas/$personaId"
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   FavoritesRoute: typeof FavoritesRoute
   LoginRoute: typeof LoginRoute
+  OrdersRoute: typeof OrdersRoute
   RegisterRoute: typeof RegisterRoute
   PersonasPersonaIdRoute: typeof PersonasPersonaIdRoute
 }
@@ -128,6 +141,13 @@ declare module "@tanstack/react-router" {
       path: "/register"
       fullPath: "/register"
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/orders": {
+      id: "/orders"
+      path: "/orders"
+      fullPath: "/orders"
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/login": {
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   FavoritesRoute: FavoritesRoute,
   LoginRoute: LoginRoute,
+  OrdersRoute: OrdersRoute,
   RegisterRoute: RegisterRoute,
   PersonasPersonaIdRoute: PersonasPersonaIdRoute,
 }
